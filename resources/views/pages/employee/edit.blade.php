@@ -13,29 +13,44 @@
                             <form action="{{ route('employee.update', $employee->id) }}" method="POST">
                                 @csrf
                                 @method('PUT')
-                            
+
                                 <div class="mb-3">
                                     <label for="name" class="form-label">Pegawai Nama</label>
-                                    <input type="text" class="form-control" id="name" name="name" 
-                                        value="{{ old('name', $employee->name) }}" required>
+                                    <input type="text" class="form-control @error('name') is-invalid @enderror"
+                                        id="name" name="name" value="{{ old('name', $employee->name) }}">
+                                    @error('name')
+                                        <div class="invalid-feedback">
+                                            {{ $message }}
+                                        </div>
+                                    @enderror
                                 </div>
-                            
+
                                 <div class="mb-3">
                                     <label for="nip" class="form-label">Pegawai NIP</label>
-                                    <input type="text" class="form-control" id="nip" name="nip" 
-                                        value="{{ old('nip', $employee->nip) }}" required>
+                                    <input type="text" class="form-control @error('nip') is-invalid @enderror"
+                                        id="nip" name="nip" value="{{ old('nip', $employee->nip) }}">
+                                    @error('nip')
+                                        <div class="invalid-feedback">
+                                            {{ $message }}
+                                        </div>
+                                    @enderror
                                 </div>
-                            
+
                                 <div class="mb-3">
                                     <label for="address" class="form-label">Pegawai Alamat</label>
-                                    <textarea class="form-control" id="address" name="address" rows="3">{{ old('address', $employee->address) }}</textarea>
+                                    <textarea class="form-control @error('nip') is-invalid @enderror" id="address" name="address" rows="3">{{ old('address', $employee->address) }}</textarea>
+                                    @error('address')
+                                        <div class="invalid-feedback">
+                                            {{ $message }}
+                                        </div>
+                                    @enderror
                                 </div>
 
                                 <div class="card-footer">
                                     <a href="{{ route('employee.index') }}" class="btn btn-secondary">Back</a>
                                     <button type="submit" class="btn btn-primary">Save</button>
                                 </div>
-                            </form>                            
+                            </form>
                         </div>
                     </div>
                 </div>

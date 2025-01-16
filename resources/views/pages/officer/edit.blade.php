@@ -7,7 +7,7 @@
                 <div class="col-12">
                     <div class="card">
                         <div class="card-header pb-0">
-                            <h6>Edit Peminjaman</h6>
+                            <h6>Edit Petugas</h6>
                         </div>
                         <div class="card-body">
                             <form action="{{ route('officer.update', $officer->id) }}" method="POST">
@@ -15,44 +15,64 @@
                                 @method('PUT')
 
                                 <div class="mb-3">
-                                    <label for="borrow_date" class="form-label">Tanggal Peminjaman</label>
-                                    <input type="date" class="form-control" id="borrow_date" name="borrow_date" 
-                                        value="{{ old('borrow_date', $officer->borrow_date) }}" required>
+                                    <label for="username" class="form-label">Username</label>
+                                    <input type="text" class="form-control @error('username') is-invalid @enderror"
+                                        id="username" name="username" value="{{ old('username', $officer->username) }}"
+                                       >
+                                    @error('username')
+                                        <div class="invalid-feedback">
+                                            {{ $message }}
+                                        </div>
+                                    @enderror
                                 </div>
 
                                 <div class="mb-3">
-                                    <label for="return_date" class="form-label">Tanggal Pengembalian</label>
-                                    <input type="date" class="form-control" id="return_date" name="return_date" 
-                                        value="{{ old('return_date', $officer->return_date) }}">
+                                    <label for="password" class="form-label">Password</label>
+                                    <input type="password" class="form-control @error('password') is-invalid @enderror"
+                                        id="password" name="password">
+                                    <small class="text-muted">Kosongkan jika tidak ingin mengubah password.</small>
+                                    @error('password')
+                                        <div class="invalid-feedback">
+                                            {{ $message }}
+                                        </div>
+                                    @enderror
                                 </div>
 
                                 <div class="mb-3">
-                                    <label for="loan_status" class="form-label">Status Peminjaman</label>
-                                    <select class="form-control" id="loan_status" name="loan_status" required>
-                                        <option value="pending" {{ old('loan_status', $officer->loan_status) == 'pending' ? 'selected' : '' }}>Pending</option>
-                                        <option value="approved" {{ old('loan_status', $officer->loan_status) == 'approved' ? 'selected' : '' }}>Approved</option>
-                                        <option value="returned" {{ old('loan_status', $officer->loan_status) == 'returned' ? 'selected' : '' }}>Returned</option>
-                                    </select>
+                                    <label for="name" class="form-label">Nama</label>
+                                    <input type="text" class="form-control @error('name') is-invalid @enderror"
+                                        id="name" name="name" value="{{ old('name', $officer->name) }}">
+                                    @error('name')
+                                        <div class="invalid-feedback">
+                                            {{ $message }}
+                                        </div>
+                                    @enderror
                                 </div>
 
                                 <div class="mb-3">
-                                    <label for="id_level" class="form-label">Petugas</label>
-                                    <select class="form-control" id="id_level" name="id_level" required>
-                                        <option value="" disabled selected>Pilih Petugas</option>
+                                    <label for="id_level" class="form-label">Level</label>
+                                    <select class="form-control @error('id_level') is-invalid @enderror" id="id_level"
+                                        name="id_level">
+                                        <option value="" disabled selected>Pilih Level</option>
                                         @foreach ($levels as $level)
-                                            <option value="{{ $level->id }}" 
+                                            <option value="{{ $level->id }}"
                                                 {{ old('id_level', $officer->id_level) == $level->id ? 'selected' : '' }}>
-                                                {{ $level->name }} ({{ $level->nip }})
+                                                {{ $level->name }}
                                             </option>
                                         @endforeach
                                     </select>
+                                    @error('id_level')
+                                        <div class="invalid-feedback">
+                                            {{ $message }}
+                                        </div>
+                                    @enderror
                                 </div>
 
                                 <div class="card-footer">
                                     <a href="{{ route('officer.index') }}" class="btn btn-secondary">Back</a>
                                     <button type="submit" class="btn btn-primary">Save</button>
                                 </div>
-                            </form>                            
+                            </form>
                         </div>
                     </div>
                 </div>

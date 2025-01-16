@@ -10,15 +10,33 @@
                 <div class="modal-body">
                     <div class="mb-3">
                         <label for="name" class="form-label">Jenis Inventaris Nama</label>
-                        <input type="text" class="form-control" id="name" name="name" required>
+                        <input type="text" class="form-control @error('name') is-invalid @enderror" id="name"
+                            name="name" required>
+                        @error('name')
+                            <div class="invalid-feedback">
+                                {{ $message }}
+                            </div>
+                        @enderror
                     </div>
                     <div class="mb-3">
                         <label for="code" class="form-label">Jenis Inventaris Kode</label>
-                        <input type="text" class="form-control" id="code" name="code" required>
+                        <input type="text" class="form-control @error('code') is-invalid @enderror" id="code"
+                            name="code" required>
+                        @error('code')
+                            <div class="invalid-feedback">
+                                {{ $message }}
+                            </div>
+                        @enderror
                     </div>
                     <div class="mb-3">
                         <label for="information" class="form-label">Jenis Inventaris Informasi</label>
-                        <textarea class="form-control" id="information" name="information" rows="3"></textarea>
+                        <textarea class="form-control @error('information') is-invalid @enderror" id="information" name="information"
+                            rows="3"></textarea>
+                        @error('information')
+                            <div class="invalid-feedback">
+                                {{ $message }}
+                            </div>
+                        @enderror
                     </div>
                 </div>
                 <div class="modal-footer">

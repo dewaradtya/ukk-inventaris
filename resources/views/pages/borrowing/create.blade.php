@@ -1,4 +1,5 @@
-<div class="modal fade" id="createBorrowingModal" tabindex="-1" aria-labelledby="createBorrowingModalLabel" aria-hidden="true">
+<div class="modal fade" id="createBorrowingModal" tabindex="-1" aria-labelledby="createBorrowingModalLabel"
+    aria-hidden="true">
     <div class="modal-dialog">
         <div class="modal-content">
             <div class="modal-header">
@@ -10,28 +11,58 @@
                 <div class="modal-body">
                     <div class="mb-3">
                         <label for="borrow_date" class="form-label">Tanggal Peminjaman</label>
-                        <input type="date" class="form-control" id="borrow_date" name="borrow_date" required>
+                        <input type="date" class="form-control @error('borrow_date') is-invalid @enderror"
+                            id="borrow_date" name="borrow_date" value="{{ old('borrow_date') }}" required>
+                        @error('borrow_date')
+                            <div class="invalid-feedback">
+                                {{ $message }}
+                            </div>
+                        @enderror
                     </div>
                     <div class="mb-3">
                         <label for="return_date" class="form-label">Tanggal Pengembalian</label>
-                        <input type="date" class="form-control" id="return_date" name="return_date">
+                        <input type="date" class="form-control @error('return_date') is-invalid @enderror"
+                            id="return_date" name="return_date" value="{{ old('return_date') }}" required>
+                        @error('return_date')
+                            <div class="invalid-feedback">
+                                {{ $message }}
+                            </div>
+                        @enderror
                     </div>
                     <div class="mb-3">
                         <label for="loan_status" class="form-label">Status Peminjaman</label>
-                        <select class="form-control" id="loan_status" name="loan_status" required>
-                            <option value="pending">Pending</option>
-                            <option value="approved">Approved</option>
-                            <option value="returned">Returned</option>
+                        <select class="form-control @error('loan_status') is-invalid @enderror" id="loan_status"
+                            name="loan_status">
+                            <option value="pending" {{ old('loan_status') == 'pending' ? 'selected' : '' }}>Pending
+                            </option>
+                            <option value="approved" {{ old('loan_status') == 'approved' ? 'selected' : '' }}>Approved
+                            </option>
+                            <option value="returned" {{ old('loan_status') == 'returned' ? 'selected' : '' }}>Returned
+                            </option>
                         </select>
+                        @error('loan_status')
+                            <div class="invalid-feedback">
+                                {{ $message }}
+                            </div>
+                        @enderror
                     </div>
                     <div class="mb-3">
                         <label for="id_employee" class="form-label">Pegawai</label>
-                        <select class="form-control" id="id_employee" name="id_employee" required>
+                        <select class="form-control @error('id_employee') is-invalid @enderror" id="id_employee"
+                            name="id_employee">
                             <option value="" disabled selected>Select Pegawai</option>
                             @foreach ($employees as $employee)
-                                <option value="{{ $employee->id }}">{{ $employee->name }} ({{ $employee->nip }})</option>
+                                <option value="{{ $employee->id }}"
+                                    {{ old('id_employee') == $employee->id ? 'selected' : '' }}>
+                                    {{ $employee->name }} ({{ $employee->nip }})
+                                </option>
                             @endforeach
                         </select>
+                        @error('id_employee')
+                            <div class="invalid-feedback">
+                                {{ $message }}
+                            </div>
+                        @enderror
                     </div>
                 </div>
                 <div class="modal-footer">

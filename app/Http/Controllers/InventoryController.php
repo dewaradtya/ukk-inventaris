@@ -15,19 +15,13 @@ class InventoryController extends Controller
      */
     public function index()
     {
-        $inventories = Inventory::all();
+        $inventories = Inventory::with(['type', 'room', 'officer'])->get();
         $types = Type::all();
         $rooms = Room::all();
         $officers = Officer::all();
 
-        return view('pages.inventory.index', [
-            'inventories' => $inventories,
-            'types' => $types,
-            'rooms' => $rooms,
-            'officers' => $officers,
-        ]);
+        return view('pages.inventory.index', compact('inventories', 'types', 'rooms', 'officers'));
     }
-
 
     /**
      * Show the form for creating a new resource.
@@ -49,22 +43,29 @@ class InventoryController extends Controller
      */
     public function store(Request $request)
     {
-        // Validasi input
         $request->validate([
-            'borrow_date' => 'required|date',
-            'return_date' => 'nullable|date|after_or_equal:borrow_date',
-            'loan_status' => 'required|string',
-            'id_employee' => 'required|exists:employees,id',
+            'name' => 'required|string|max:255',
+            'condition' => 'required|string',
+            'amount' => 'required|integer|min:1',
+            'register_date' => 'required|date',
+            'code' => 'required|string|unique:inventories,code',
+            'id_type' => 'required|exists:types,id',
+            'id_room' => 'required|exists:rooms,id',
+            'id_officer' => 'required|exists:officers,id',
         ]);
 
         Inventory::create([
-            'borrow_date' => $request->borrow_date,
-            'return_date' => $request->return_date,
-            'loan_status' => $request->loan_status,
-            'id_employee' => $request->id_employee,
+            'name' => $request->name,
+            'condition' => $request->condition,
+            'amount' => $request->amount,
+            'register_date' => $request->register_date,
+            'code' => $request->code,
+            'id_type' => $request->id_type,
+            'id_room' => $request->id_room,
+            'id_officer' => $request->id_officer,
         ]);
 
-        return redirect()->route('inventory.index')->with('success', 'inventory berhasil ditambahkan');
+        return redirect()->route('inventory.index')->with('success', 'Inventory berhasil ditambahkan');
     }
 
     /**
@@ -90,19 +91,27 @@ class InventoryController extends Controller
     public function update(Request $request, string $id)
     {
         $request->validate([
-            'borrow_date' => 'required|date',
-            'return_date' => 'nullable|date|after_or_equal:borrow_date',
-            'loan_status' => 'required|string',
-            'id_employee' => 'required|exists:employees,id',
+            'name' => 'required|string|max:255',
+            'condition' => 'required|string',
+            'amount' => 'required|integer|min:1',
+            'register_date' => 'required|date',
+            'code' => 'required|unique:rooms,code,' . $id,
+            'id_type' => 'required|exists:types,id',
+            'id_room' => 'required|exists:rooms,id',
+            'id_officer' => 'required|exists:officers,id',
         ]);
 
         $inventory = Inventory::findOrFail($id);
 
         $inventory->update([
-            'borrow_date' => $request->borrow_date,
-            'return_date' => $request->return_date,
-            'loan_status' => $request->loan_status,
-            'id_employee' => $request->id_employee,
+            'name' => $request->name,
+            'condition' => $request->condition,
+            'amount' => $request->amount,
+            'register_date' => $request->register_date,
+            'code' => $request->code,
+            'id_type' => $request->id_type,
+            'id_room' => $request->id_room,
+            'id_officer' => $request->id_officer,
         ]);
 
         return redirect()->route('inventory.index')->with('success', 'inventory berhasil diperbarui');

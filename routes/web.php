@@ -44,10 +44,6 @@ Route::group(['middleware' => 'auth'], function () {
 		return view('profile');
 	})->name('profile');
 
-	Route::get('rtl', function () {
-		return view('rtl');
-	})->name('rtl');
-
 	Route::get('user-management', function () {
 		return view('laravel-examples/user-management');
 	})->name('user-management');
