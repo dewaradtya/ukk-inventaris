@@ -13,7 +13,7 @@ class EmployeeController extends Controller
     public function index()
     {
         $employees = Employee::all();
-        return view('pages.employee.index', [
+        return view('pages.admin.employee.index', [
             'employees' => $employees
         ]);
     }
@@ -23,7 +23,7 @@ class EmployeeController extends Controller
      */
     public function create()
     {
-        return view('pages.employee.create');
+        return view('pages.admin.employee.create');
     }
 
     /**
@@ -60,7 +60,7 @@ class EmployeeController extends Controller
     public function edit(string $id)
     {
         $employee = Employee::findOrFail($id);
-        return view('pages.employee.edit', [
+        return view('pages.admin.employee.edit', [
             'employee' => $employee,
         ]);
     }

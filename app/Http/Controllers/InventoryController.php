@@ -20,7 +20,7 @@ class InventoryController extends Controller
         $rooms = Room::all();
         $officers = Officer::all();
 
-        return view('pages.inventory.index', compact('inventories', 'types', 'rooms', 'officers'));
+        return view('pages.admin.inventory.index', compact('inventories', 'types', 'rooms', 'officers'));
     }
 
     /**
@@ -31,7 +31,7 @@ class InventoryController extends Controller
         $types = Type::all();
         $rooms = Room::all();
         $officers = Officer::all();
-        return view('pages.inventory.create', [
+        return view('pages.admin.inventory.create', [
             'types' => $types,
             'rooms' => $rooms,
             'officers' => $officers,
@@ -77,7 +77,7 @@ class InventoryController extends Controller
         $types = Type::all();
         $rooms = Room::all();
         $officers = Officer::all();
-        return view('pages.inventory.edit', [
+        return view('pages.admin.inventory.edit', [
             'inventory' => $inventory,
             'types' => $types,
             'rooms' => $rooms,

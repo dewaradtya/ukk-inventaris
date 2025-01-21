@@ -16,7 +16,7 @@ class BorrowingController extends Controller
         $borrowings = Borrowing::all();
         $employees = Employee::all();
     
-        return view('pages.borrowing.index', [
+        return view('pages.admin.borrowing.index', [
             'borrowings' => $borrowings,
             'employees' => $employees,
         ]);
@@ -29,7 +29,7 @@ class BorrowingController extends Controller
     public function create()
     {
         $employees = Employee::all();
-        return view('pages.borrowing.create', [
+        return view('pages.admin.borrowing.create', [
             'employees' => $employees,
         ]);
     }
@@ -64,7 +64,7 @@ class BorrowingController extends Controller
     {
         $borrowing = Borrowing::findOrFail($id);
         $employees = Employee::all();
-        return view('pages.borrowing.edit', [
+        return view('pages.admin.borrowing.edit', [
             'borrowing' => $borrowing,
             'employees' => $employees,
         ]);

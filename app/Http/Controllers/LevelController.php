@@ -14,7 +14,7 @@ class LevelController extends Controller
     {
         $levels = Level::all();
     
-        return view('pages.level.index', [
+        return view('pages.admin.level.index', [
             'levels' => $levels,
         ]);
     }
@@ -25,7 +25,7 @@ class LevelController extends Controller
      */
     public function create()
     {
-        return view('pages.level.create');
+        return view('pages.admin.level.create');
     }
 
     /**
@@ -51,7 +51,7 @@ class LevelController extends Controller
     public function edit(string $id)
     {
         $level = Level::findOrFail($id);
-        return view('pages.level.edit', [
+        return view('pages.admin.level.edit', [
             'level' => $level,
         ]);
     }

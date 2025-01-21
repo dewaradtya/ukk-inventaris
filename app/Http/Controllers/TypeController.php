@@ -13,7 +13,7 @@ class TypeController extends Controller
     public function index()
     {
         $types = Type::all();
-        return view('pages.type.index', [
+        return view('pages.admin.type.index', [
             'types' => $types
         ]);
     }
@@ -23,7 +23,7 @@ class TypeController extends Controller
      */
     public function create()
     {
-        return view('pages.type.create');
+        return view('pages.admin.type.create');
     }
 
     /**
@@ -60,7 +60,7 @@ class TypeController extends Controller
     public function edit(string $id)
     {
         $type = Type::findOrFail($id);
-        return view('pages.type.edit', [
+        return view('pages.admin.type.edit', [
             'type' => $type,
         ]);
     }

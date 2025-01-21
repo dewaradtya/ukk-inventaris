@@ -13,7 +13,7 @@ class RoomController extends Controller
     public function index()
     {
         $rooms = Room::all();
-        return view('pages.room.index', [
+        return view('pages.admin.room.index', [
             'rooms' => $rooms
         ]);
     }
@@ -23,7 +23,7 @@ class RoomController extends Controller
      */
     public function create()
     {
-        return view('pages.room.create');
+        return view('pages.admin.room.create');
     }
 
     /**
@@ -60,7 +60,7 @@ class RoomController extends Controller
     public function edit(string $id)
     {
         $room = Room::findOrFail($id);
-        return view('pages.room.edit', [
+        return view('pages.admin.room.edit', [
             'room' => $room,
         ]);
     }

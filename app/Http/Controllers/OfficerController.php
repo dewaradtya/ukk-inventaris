@@ -18,7 +18,7 @@ class OfficerController extends Controller
         $officers = Officer::all();
         $levels = Level::all();
     
-        return view('pages.officer.index', [
+        return view('pages.admin.officer.index', [
             'officers' => $officers,
             'levels' => $levels,
         ]);
@@ -30,7 +30,7 @@ class OfficerController extends Controller
     public function create()
     {
         $levels = Level::all(); // Perbaikan case sensitivity
-        return view('pages.officer.create', [
+        return view('pages.admin.officer.create', [
             'levels' => $levels,
         ]);
     }
@@ -65,7 +65,7 @@ class OfficerController extends Controller
     {
         $officer = Officer::findOrFail($id);
         $levels = Level::all(); // Perbaikan case sensitivity
-        return view('pages.officer.edit', [
+        return view('pages.admin.officer.edit', [
             'officer' => $officer,
             'levels' => $levels,
         ]);
