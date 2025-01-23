@@ -42,15 +42,12 @@
                                     <label for="loan_status" class="form-label">Status Peminjaman</label>
                                     <select class="form-control @error('loan_status') is-invalid @enderror" id="loan_status"
                                         name="loan_status">
-                                        <option value="pending"
-                                            {{ old('loan_status', $borrowing->loan_status) == 'pending' ? 'selected' : '' }}>
-                                            Pending</option>
-                                        <option value="approved"
-                                            {{ old('loan_status', $borrowing->loan_status) == 'approved' ? 'selected' : '' }}>
-                                            Approved</option>
+                                        <option value="borrow"
+                                            {{ old('loan_status', $borrowing->loan_status) == 'borrow' ? 'selected' : '' }}>
+                                            Dipinjam</option>
                                         <option value="returned"
                                             {{ old('loan_status', $borrowing->loan_status) == 'returned' ? 'selected' : '' }}>
-                                            Returned</option>
+                                            Dikembalikan</option>
                                     </select>
                                     @error('loan_status')
                                         <div class="invalid-feedback">

@@ -17,12 +17,15 @@
 
     <!-- Fonts and icons -->
     <link href="https://fonts.googleapis.com/css?family=Open+Sans:300,400,600,700" rel="stylesheet" />
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css" rel="stylesheet">
     <!-- Nucleo Icons -->
     <link href="{{ asset('assets/css/nucleo-icons.css') }}" rel="stylesheet" />
     <link href="{{ asset('assets/css/nucleo-svg.css') }}" rel="stylesheet" />
-
+    
     <!-- CSS Files -->
     <link id="pagestyle" href="{{ asset('assets/css/soft-ui-dashboard.css?v=1.0.3') }}" rel="stylesheet" />
+    <link href="{{ asset('assets/css/style.css') }}" rel="stylesheet" />
 </head>
 
 <body class="g-sidenav-show bg-gray-100 {{ \Request::is('rtl') ? 'rtl' : '' }}">
@@ -41,6 +44,13 @@
             <p class="m-0">{{ session('success') }}</p>
         </div>
     @endif
+
+    @if (session('error'))
+        <div class="position-fixed alert alert-danger">
+            {{ session('error') }}
+        </div>
+    @endif
+
 
     <!-- Core JS Files -->
     <script src="{{ asset('assets/js/core/popper.min.js') }}"></script>

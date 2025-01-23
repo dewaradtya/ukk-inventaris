@@ -13,9 +13,28 @@ class InventoryController extends Controller
     /**
      * Display a listing of the resource.
      */
-    public function index()
+    public function index(Request $request)
     {
-        $inventories = Inventory::with(['type', 'room', 'officer'])->get();
+        $query = Inventory::with(['type', 'room', 'officer']);
+
+        if ($request->has('search')) {
+            $search = $request->search;
+            $query->where(function ($q) use ($search) {
+                $q->where('name', 'like', "%{$search}%")
+                    ->orWhere('code', 'like', "%{$search}%")
+                    ->orWhereHas('type', function ($q) use ($search) {
+                        $q->where('name', 'like', "%{$search}%");
+                    })
+                    ->orWhereHas('room', function ($q) use ($search) {
+                        $q->where('name', 'like', "%{$search}%");
+                    })
+                    ->orWhereHas('officer', function ($q) use ($search) {
+                        $q->where('name', 'like', "%{$search}%");
+                    });
+            });
+        }
+
+        $inventories = $query->paginate(10);
         $types = Type::all();
         $rooms = Room::all();
         $officers = Officer::all();

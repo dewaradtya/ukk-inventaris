@@ -2,20 +2,29 @@
 
 namespace App\Http\Controllers;
 
+use App\Exports\RoomExport;
+use App\Models\Inventory;
 use App\Models\Room;
 use Illuminate\Http\Request;
+use Maatwebsite\Excel\Facades\Excel;
 
 class RoomController extends Controller
 {
     /**
      * Display a listing of the resource.
      */
-    public function index()
+    public function index(Request $request)
     {
-        $rooms = Room::all();
-        return view('pages.admin.room.index', [
-            'rooms' => $rooms
-        ]);
+        $query = Room::query();
+
+        if ($request->has('search') && $request->search != '') {
+            $query->where('name', 'like', '%' . $request->search . '%')
+                ->orWhere('code', 'like', '%' . $request->search . '%');
+        }
+
+        $rooms = $query->paginate(10);
+
+        return view('pages.admin.room.index', compact('rooms'));
     }
 
     /**
@@ -92,8 +101,17 @@ class RoomController extends Controller
     public function destroy(string $id)
     {
         $room = Room::findOrFail($id);
+        $isUsed = Inventory::where('id_room', $id)->exists();
+        if ($isUsed) {
+            return redirect()->route('room.index')->withErrors(['error' => 'Data tidak dapat dihapus karena sedang digunakan di Inventory!']);
+        }
         $room->delete();
 
         return redirect()->route('room.index')->with('success', 'Data berhasil dihapus!');
+    }
+
+    public function export() 
+    {
+        return Excel::download(new RoomExport, 'Ruang Inventaris.xlsx');
     }
 }

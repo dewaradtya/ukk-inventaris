@@ -18,17 +18,19 @@ class RegisterController extends Controller
     {
         $attributes = request()->validate([
             'name' => ['required', 'max:50'],
+            'username' => ['required', 'min:3', 'max:20', Rule::unique('users', 'username')],
             'email' => ['required', 'email', 'max:50', Rule::unique('users', 'email')],
             'password' => ['required', 'min:5', 'max:20'],
-            'agreement' => ['accepted']
+            'agreement' => ['accepted'],
         ]);
-        $attributes['password'] = bcrypt($attributes['password'] );
 
-        
+        $attributes['id_level'] = 3;
 
-        session()->flash('success', 'Your account has been created.');
+        $attributes['password'] = bcrypt($attributes['password']);
+
         $user = User::create($attributes);
-        Auth::login($user); 
-        return redirect('/dashboard');
+        Auth::login($user);
+
+        return redirect('/dashboard')->with('success', 'Your account has been created.');
     }
 }

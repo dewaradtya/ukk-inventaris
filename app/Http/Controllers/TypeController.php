@@ -2,20 +2,29 @@
 
 namespace App\Http\Controllers;
 
+use App\Exports\TypeExport;
+use App\Models\Inventory;
 use App\Models\Type;
 use Illuminate\Http\Request;
+use Maatwebsite\Excel\Facades\Excel;
 
 class TypeController extends Controller
 {
     /**
      * Display a listing of the resource.
      */
-    public function index()
+    public function index(Request $request)
     {
-        $types = Type::all();
-        return view('pages.admin.type.index', [
-            'types' => $types
-        ]);
+        $query = Type::query();
+
+        if ($request->has('search') && $request->search != '') {
+            $query->where('name', 'like', '%' . $request->search . '%')
+                ->orWhere('code', 'like', '%' . $request->search . '%');
+        }
+
+        $types = $query->paginate(10);
+
+        return view('pages.admin.type.index', compact('types'));
     }
 
     /**
@@ -92,9 +101,19 @@ class TypeController extends Controller
      */
     public function destroy(string $id)
     {
-        $types = Type::findOrFail($id);
-        $types->delete();
+        $type = Type::findOrFail($id);
+        $isUsed = Inventory::where('id_type', $id)->exists();
+        if ($isUsed) {
+            return redirect()->route('type.index')->withErrors(['error' => 'Data tidak dapat dihapus karena sedang digunakan di Inventory!']);
+        }
+        $type->delete();
 
         return redirect()->route('type.index')->with('success', 'Data berhasil dihapus!');
+    }
+
+
+    public function export()
+    {
+        return Excel::download(new TypeExport, 'Jenis Inventaris.xlsx');
     }
 }

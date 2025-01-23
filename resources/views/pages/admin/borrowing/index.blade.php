@@ -51,7 +51,8 @@
                                                         {{ $borrowing->return_date ?? '-' }}</p>
                                                 </td>
                                                 <td>
-                                                    <p class="text-sm font-weight-bold mb-0">{{ $borrowing->loan_status }}</p>
+                                                    <p class="text-sm font-weight-bold mb-0">{{ $borrowing->loan_status }}
+                                                    </p>
                                                 </td>
                                                 <td>
                                                     <p class="text-sm mb-0">
@@ -60,13 +61,19 @@
                                                 </td>
                                                 <td class="align-middle">
                                                     <a href="{{ route('borrowing.edit', $borrowing->id) }}"
-                                                        class="btn btn-primary btn-sm">Edit</a>
+                                                        class="btn btn-outline-primary p-2">
+                                                        <i class="fa fa-pen text-primary fa-lg" data-bs-toggle="tooltip"
+                                                            data-bs-placement="top" title="Edit"></i>
+                                                    </a>
                                                     <form action="{{ route('borrowing.destroy', $borrowing->id) }}"
                                                         method="POST" class="d-inline">
                                                         @csrf
                                                         @method('DELETE')
-                                                        <button type="submit" class="btn btn-danger btn-sm"
-                                                            onclick="return confirm('Apakah Anda yakin ingin menghapus borrowing ini?')">Hapus</button>
+                                                        <button type="submit" class="btn btn-outline-danger p-2"
+                                                            onclick="return confirm('Apakah Anda yakin ingin menghapus peminjaman ini?')"
+                                                            data-bs-toggle="tooltip" data-bs-placement="top" title="Hapus">
+                                                            <i class="fa fa-trash fa-lg"></i>
+                                                        </button>
                                                     </form>
                                                 </td>
                                             </tr>

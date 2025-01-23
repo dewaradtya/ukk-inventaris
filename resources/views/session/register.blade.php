@@ -75,6 +75,12 @@
                   @enderror
                 </div>
                 <div class="mb-3">
+                  <input type="text" class="form-control" placeholder="Username" name="username" id="username" aria-label="Username" aria-describedby="username" value="{{ old('username') }}">
+                  @error('username')
+                    <p class="text-danger text-xs mt-2">{{ $message }}</p>
+                  @enderror
+                </div>
+                <div class="mb-3">
                   <input type="email" class="form-control" placeholder="Email" name="email" id="email" aria-label="Email" aria-describedby="email-addon" value="{{ old('email') }}">
                   @error('email')
                     <p class="text-danger text-xs mt-2">{{ $message }}</p>

@@ -27,15 +27,22 @@
 
                                 <div class="mb-3">
                                     <label for="condition" class="form-label">Kondisi</label>
-                                    <input type="text" class="form-control @error('condition') is-invalid @enderror"
-                                        id="condition" name="condition"
-                                        value="{{ old('condition', $inventory->condition) }}">
+                                    <select 
+                                        class="form-control @error('condition') is-invalid @enderror" 
+                                        id="condition" 
+                                        name="condition" 
+                                        required>
+                                        <option value="" disabled {{ old('condition', $inventory->condition) == '' ? 'selected' : '' }}>Pilih Kondisi</option>
+                                        <option value="baik" {{ old('condition', $inventory->condition) == 'baik' ? 'selected' : '' }}>Baik</option>
+                                        <option value="rusak" {{ old('condition', $inventory->condition) == 'rusak' ? 'selected' : '' }}>Rusak</option>
+                                        <option value="hilang" {{ old('condition', $inventory->condition) == 'hilang' ? 'selected' : '' }}>Hilang</option>
+                                    </select>
                                     @error('condition')
                                         <div class="invalid-feedback">
                                             {{ $message }}
                                         </div>
                                     @enderror
-                                </div>
+                                </div>                                
 
                                 <div class="mb-3">
                                     <label for="amount" class="form-label">Jumlah</label>

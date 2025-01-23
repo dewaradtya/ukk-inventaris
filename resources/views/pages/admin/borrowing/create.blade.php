@@ -22,7 +22,7 @@
                     <div class="mb-3">
                         <label for="return_date" class="form-label">Tanggal Pengembalian</label>
                         <input type="date" class="form-control @error('return_date') is-invalid @enderror"
-                            id="return_date" name="return_date" value="{{ old('return_date') }}" required>
+                            id="return_date" name="return_date" value="{{ old('return_date') }}" readonly>
                         @error('return_date')
                             <div class="invalid-feedback">
                                 {{ $message }}
@@ -33,11 +33,9 @@
                         <label for="loan_status" class="form-label">Status Peminjaman</label>
                         <select class="form-control @error('loan_status') is-invalid @enderror" id="loan_status"
                             name="loan_status">
-                            <option value="pending" {{ old('loan_status') == 'pending' ? 'selected' : '' }}>Pending
+                            <option value="borrow" {{ old('loan_status') == 'borrow' ? 'selected' : '' }}>Dipinjam
                             </option>
-                            <option value="approved" {{ old('loan_status') == 'approved' ? 'selected' : '' }}>Approved
-                            </option>
-                            <option value="returned" {{ old('loan_status') == 'returned' ? 'selected' : '' }}>Returned
+                            <option value="returned" {{ old('loan_status') == 'returned' ? 'selected' : '' }}>Dikembalikan
                             </option>
                         </select>
                         @error('loan_status')

@@ -10,11 +10,32 @@
                             <div>
                                 <h6 class="mb-0">Tabel Jenis Inventaris</h6>
                             </div>
-                            <button class="btn bg-gradient-primary btn-sm mb-0" data-bs-toggle="modal"
-                                data-bs-target="#createTypeModal">
-                                Tambah Jenis
-                            </button>
+                            <div class="d-flex">
+                                <form action="{{ route('type.index') }}" method="GET" class="d-flex me-2">
+                                    <div class="input-group">
+                                        <input type="text" name="search" class="form-control form-control-sm"
+                                            placeholder="Cari nama atau kode..." value="{{ request('search') }}">
+                                        <span class="input-group-text text-body"><i class="fas fa-search"
+                                                aria-hidden="true"></i></span>
+                                    </div>
+                                </form>
+                                <a href="{{ route('type.export') }}" class="btn bg-gradient-success btn-sm mb-0 me-2">
+                                    Export Data
+                                </a>
+                                <button class="btn bg-gradient-primary btn-sm mb-0" data-bs-toggle="modal"
+                                    data-bs-target="#createTypeModal">
+                                    Tambah Jenis
+                                </button>
+                            </div>
                         </div>
+                        @if ($errors->any())
+                            <div class="alert alert-danger text-white mt-2">
+                                    @foreach ($errors->all() as $error)
+                                        <p>{{ $error }}</p>
+                                    @endforeach
+                            </div>
+                        @endif
+
                         <div class="card-body px-0 pt-0 pb-2">
                             <div class="table-responsive p-0">
                                 <table class="table align-items-center mb-0">
@@ -51,13 +72,19 @@
                                                 </td>
                                                 <td class="align-middle">
                                                     <a href="{{ route('type.edit', $type->id) }}"
-                                                        class="btn btn-primary btn-sm">Edit</a>
+                                                        class="btn btn-outline-primary p-2">
+                                                        <i class="fa fa-pen text-primary fa-lg" data-bs-toggle="tooltip"
+                                                            data-bs-placement="top" title="Edit"></i>
+                                                    </a>
                                                     <form action="{{ route('type.destroy', $type->id) }}" method="POST"
                                                         class="d-inline">
                                                         @csrf
                                                         @method('DELETE')
-                                                        <button type="submit" class="btn btn-danger btn-sm"
-                                                            onclick="return confirm('Apakah Anda yakin ingin menghapus type ini?')">Hapus</button>
+                                                        <button type="submit" class="btn btn-outline-danger p-2"
+                                                            onclick="return confirm('Apakah Anda yakin ingin menghapus ruang ini?')"
+                                                            data-bs-toggle="tooltip" data-bs-placement="top" title="Hapus">
+                                                            <i class="fa fa-trash fa-lg"></i>
+                                                        </button>
                                                     </form>
                                                 </td>
                                             </tr>
@@ -69,12 +96,14 @@
                                     </tbody>
                                 </table>
                             </div>
+                            <div class="d-flex justify-content-center mt-3">
+                                {{ $types->withQueryString()->links() }}
+                            </div>
                         </div>
                     </div>
                 </div>
             </div>
         </div>
     </main>
-
     @include('pages.admin.type.create')
 @endsection

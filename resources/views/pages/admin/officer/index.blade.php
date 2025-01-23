@@ -55,13 +55,19 @@
                                                 </td>
                                                 <td class="align-middle">
                                                     <a href="{{ route('officer.edit', $officer->id) }}"
-                                                        class="btn btn-primary btn-sm">Edit</a>
+                                                        class="btn btn-outline-primary p-2">
+                                                        <i class="fa fa-pen text-primary fa-lg" data-bs-toggle="tooltip"
+                                                            data-bs-placement="top" title="Edit"></i>
+                                                    </a>
                                                     <form action="{{ route('officer.destroy', $officer->id) }}"
                                                         method="POST" class="d-inline">
                                                         @csrf
                                                         @method('DELETE')
-                                                        <button type="submit" class="btn btn-danger btn-sm"
-                                                            onclick="return confirm('Are you sure you want to delete this officer?')">Delete</button>
+                                                        <button type="submit" class="btn btn-outline-danger p-2"
+                                                            onclick="return confirm('Apakah Anda yakin ingin menghapus ruang ini?')"
+                                                            data-bs-toggle="tooltip" data-bs-placement="top" title="Hapus">
+                                                            <i class="fa fa-trash fa-lg"></i>
+                                                        </button>
                                                     </form>
                                                 </td>
                                             </tr>

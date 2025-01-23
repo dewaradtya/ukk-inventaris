@@ -20,10 +20,10 @@
                 <div class="col-auto my-auto">
                     <div class="h-100">
                         <h5 class="mb-1">
-                            {{ __('Alec Thompson') }}
+                            {{ auth()->user()->name }}
                         </h5>
                         <p class="mb-0 font-weight-bold text-sm">
-                            {{ __(' CEO / Co-Founder') }}
+                            {{ auth()->user()->level->name }}
                         </p>
                     </div>
                 </div>
@@ -150,10 +150,10 @@
                     <div class="row">
                         <div class="col-md-6">
                             <div class="form-group">
-                                <label for="user.phone" class="form-control-label">{{ __('Phone') }}</label>
-                                <div class="@error('user.phone')border border-danger rounded-3 @enderror">
-                                    <input class="form-control" type="tel" placeholder="40770888444" id="number" name="phone" value="{{ auth()->user()->phone }}">
-                                        @error('phone')
+                                <label for="user.username" class="form-control-label">{{ __('Username') }}</label>
+                                <div class="@error('user.username')border border-danger rounded-3 @enderror">
+                                    <input class="form-control" type="text" placeholder="Username" id="username" name="username" value="{{ auth()->user()->username }}">
+                                        @error('username')
                                             <p class="text-danger text-xs mt-2">{{ $message }}</p>
                                         @enderror
                                 </div>
