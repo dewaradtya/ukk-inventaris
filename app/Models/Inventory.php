@@ -18,7 +18,7 @@ class Inventory extends Model
         'code',
         'id_type',
         'id_room',
-        'id_officer',
+        'id_user',
     ];
 
     public function type(): BelongsTo
@@ -29,8 +29,8 @@ class Inventory extends Model
     {
         return $this->belongsTo(Room::class, 'id_room');
     }
-    public function officer(): BelongsTo
+    public function user(): BelongsTo
     {
-        return $this->belongsTo(Officer::class, 'id_officer');
+        return $this->belongsTo(User::class, 'id_user');
     }
 }

@@ -28,28 +28,21 @@
                                 </button>
                             </div>
                         </div>
-                        @if ($errors->any())
-                            <div class="alert alert-danger text-white mt-2">
-                                    @foreach ($errors->all() as $error)
-                                        <p>{{ $error }}</p>
-                                    @endforeach
-                            </div>
-                        @endif
                         <div class="card-body px-0 pt-0 pb-2">
                             <div class="table-responsive p-0">
                                 <table class="table align-items-center mb-0">
                                     <thead>
                                         <tr>
-                                            <th class="text-uppercase text-secondary text-sm font-weight-bolder opacity-7">
+                                            <th class="text-uppercase text-secondary text-xxs font-weight-bolder opacity-7">
                                                 Nama</th>
                                             <th
-                                                class="text-uppercase text-secondary text-sm font-weight-bolder opacity-7 ps-2">
+                                                class="text-uppercase text-secondary text-xxs font-weight-bolder opacity-7 ps-2">
                                                 Kode</th>
                                             <th
-                                                class="text-uppercase text-secondary text-sm font-weight-bolder opacity-7 ps-2">
+                                                class="text-uppercase text-secondary text-xxs font-weight-bolder opacity-7 ps-2">
                                                 Informasi</th>
                                             <th
-                                                class="text-uppercase text-secondary text-sm font-weight-bolder opacity-7 ps-2">
+                                                class="text-uppercase text-secondary text-xxs font-weight-bolder opacity-7 ps-2">
                                                 Aksi</th>
                                         </tr>
                                     </thead>
@@ -59,15 +52,15 @@
                                                 <td>
                                                     <div class="d-flex px-2 py-1">
                                                         <div class="d-flex flex-column justify-content-center">
-                                                            <h6 class="mb-0 text-sm">{{ $room->name }}</h6>
+                                                            <h6 class="mb-0 text-xs">{{ $room->name }}</h6>
                                                         </div>
                                                     </div>
                                                 </td>
                                                 <td>
-                                                    <p class="text-sm font-weight-bold mb-0">{{ $room->code }}</p>
+                                                    <p class="text-xs font-weight-bold mb-0">{{ $room->code }}</p>
                                                 </td>
                                                 <td>
-                                                    <p class="text-sm font-weight-bold mb-0">{{ $room->information }}</p>
+                                                    <p class="text-xs font-weight-bold mb-0">{{ $room->information }}</p>
                                                 </td>
                                                 <td class="align-middle">
                                                     <a href="{{ route('room.edit', $room->id) }}" class="btn btn-outline-primary p-2">

@@ -30,28 +30,28 @@
                                 <table class="table align-items-center mb-0">
                                     <thead>
                                         <tr>
-                                            <th class="text-uppercase text-secondary text-xs font-weight-bolder opacity-7">Nama</th>
-                                            <th class="text-uppercase text-secondary text-xs font-weight-bolder opacity-7 ps-2">Kondisi</th>
-                                            <th class="text-uppercase text-secondary text-xs font-weight-bolder opacity-7 ps-2">Jumlah</th>
-                                            <th class="text-uppercase text-secondary text-xs font-weight-bolder opacity-7 ps-2">Tanggal Registrasi</th>
-                                            <th class="text-uppercase text-secondary text-xs font-weight-bolder opacity-7 ps-2">Kode</th>
-                                            <th class="text-uppercase text-secondary text-xs font-weight-bolder opacity-7 ps-2">Tipe</th>
-                                            <th class="text-uppercase text-secondary text-xs font-weight-bolder opacity-7 ps-2">Ruangan</th>
-                                            <th class="text-uppercase text-secondary text-xs font-weight-bolder opacity-7 ps-2">Petugas</th>
-                                            <th class="text-uppercase text-secondary text-xs font-weight-bolder opacity-7 ps-2">Aksi</th>
+                                            <th class="text-uppercase text-secondary text-xxs font-weight-bolder opacity-7">Nama</th>
+                                            <th class="text-uppercase text-secondary text-xxs font-weight-bolder opacity-7 ps-2">Kondisi</th>
+                                            <th class="text-uppercase text-secondary text-xxs font-weight-bolder opacity-7 ps-2">Jumlah</th>
+                                            <th class="text-uppercase text-secondary text-xxs font-weight-bolder opacity-7 ps-2">Tanggal Registrasi</th>
+                                            <th class="text-uppercase text-secondary text-xxs font-weight-bolder opacity-7 ps-2">Kode</th>
+                                            <th class="text-uppercase text-secondary text-xxs font-weight-bolder opacity-7 ps-2">Tipe</th>
+                                            <th class="text-uppercase text-secondary text-xxs font-weight-bolder opacity-7 ps-2">Ruangan</th>
+                                            <th class="text-uppercase text-secondary text-xxs font-weight-bolder opacity-7 ps-2">Petugas</th>
+                                            <th class="text-uppercase text-secondary text-xxs font-weight-bolder opacity-7 ps-2">Aksi</th>
                                         </tr>
                                     </thead>
                                     <tbody>
                                         @forelse ($inventories as $inventory)
                                             <tr>
-                                                <td class="text-sm font-weight-bold mb-0">{{ $inventory->name }}</td>
-                                                <td class="text-sm font-weight-bold mb-0">{{ $inventory->condition }}</td>
-                                                <td class="text-sm font-weight-bold mb-0">{{ $inventory->amount }}</td>
-                                                <td class="text-sm font-weight-bold mb-0">{{ $inventory->register_date }}</td>
-                                                <td class="text-sm font-weight-bold mb-0">{{ $inventory->code }}</td>
-                                                <td class="text-sm font-weight-bold mb-0">{{ $inventory->type->name ?? 'N/A' }}</td>
-                                                <td class="text-sm font-weight-bold mb-0">{{ $inventory->room->name ?? 'N/A' }}</td>
-                                                <td class="text-sm font-weight-bold mb-0">{{ $inventory->officer->name ?? 'N/A' }}</td>
+                                                <td class="text-xs font-weight-bold mb-0">{{ $inventory->name }}</td>
+                                                <td class="text-xs font-weight-bold mb-0">{{ $inventory->condition }}</td>
+                                                <td class="text-xs font-weight-bold mb-0">{{ $inventory->amount }}</td>
+                                                <td class="text-xs font-weight-bold mb-0">{{ $inventory->register_date }}</td>
+                                                <td class="text-xs font-weight-bold mb-0">{{ $inventory->code }}</td>
+                                                <td class="text-xs font-weight-bold mb-0">{{ $inventory->type->name ?? 'N/A' }}</td>
+                                                <td class="text-xs font-weight-bold mb-0">{{ $inventory->room->name ?? 'N/A' }}</td>
+                                                <td class="text-xs font-weight-bold mb-0">{{ $inventory->user->name ?? 'N/A' }}</td>
                                                 <td class="align-middle">
                                                     <a href="{{ route('inventory.edit', $inventory->id) }}"
                                                         class="btn btn-outline-primary p-2">

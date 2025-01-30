@@ -86,20 +86,6 @@
                             </div>
                         @enderror
                     </div>
-                    <div class="mb-3">
-                        <label for="id_officer" class="form-label">Petugas</label>
-                        <select class="form-control @error('id_officer') is-invalid @enderror" id="id_officer" name="id_officer" required>
-                            <option value="" disabled selected>Pilih Petugas</option>
-                            @foreach ($officers as $officer)
-                                <option value="{{ $officer->id }}">{{ $officer->name }}</option>
-                            @endforeach
-                        </select>
-                        @error('id_officer')
-                            <div class="invalid-feedback">
-                                {{ $message }}
-                            </div>
-                        @enderror
-                    </div>
                 </div>
                 <div class="modal-footer">
                     <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Tutup</button>

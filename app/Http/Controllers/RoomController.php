@@ -103,7 +103,7 @@ class RoomController extends Controller
         $room = Room::findOrFail($id);
         $isUsed = Inventory::where('id_room', $id)->exists();
         if ($isUsed) {
-            return redirect()->route('room.index')->withErrors(['error' => 'Data tidak dapat dihapus karena sedang digunakan di Inventory!']);
+            return redirect()->back()->with(['error' => 'Data tidak dapat dihapus karena sedang digunakan di Inventory!']);
         }
         $room->delete();
 

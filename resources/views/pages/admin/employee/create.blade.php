@@ -1,4 +1,5 @@
-<div class="modal fade" id="createEmployeeModal" tabindex="-1" aria-labelledby="createEmployeeModalLabel" aria-hidden="true">
+<div class="modal fade" id="createEmployeeModal" tabindex="-1" aria-labelledby="createEmployeeModalLabel"
+    aria-hidden="true">
     <div class="modal-dialog">
         <div class="modal-content">
             <div class="modal-header">
@@ -10,7 +11,8 @@
                 <div class="modal-body">
                     <div class="mb-3">
                         <label for="name" class="form-label">Nama</label>
-                        <input type="text" class="form-control @error('name') is-invalid @enderror" id="name" name="name" required>
+                        <input type="text" class="form-control @error('name') is-invalid @enderror" id="name"
+                            name="name" required>
                         @error('name')
                             <div class="invalid-feedback">
                                 {{ $message }}
@@ -19,7 +21,8 @@
                     </div>
                     <div class="mb-3">
                         <label for="nip" class="form-label">NIP</label>
-                        <input type="text" class="form-control @error('nip') is-invalid @enderror" id="nip" name="nip" required>
+                        <input type="text" class="form-control @error('nip') is-invalid @enderror" id="nip"
+                            name="nip" required>
                         @error('nip')
                             <div class="invalid-feedback">
                                 {{ $message }}
@@ -35,6 +38,25 @@
                             </div>
                         @enderror
                     </div>
+                    @if (auth()->user()->level->name === 'Admin')
+                        <div class="mb-3">
+                            <label for="user_id">Pilih User</label>
+                            <select name="user_id" id="user_id"
+                                class="form-control @error('user_id') is-invalid @enderror">
+                                <option value="">-- Pilih User --</option>
+                                @foreach ($users as $user)
+                                    @if ($user->employee->isEmpty() && $user->level->name === 'User')
+                                        <option value="{{ $user->id }}">{{ $user->name }}</option>
+                                    @endif
+                                @endforeach
+                            </select>
+                            @error('user_id')
+                                <div class="invalid-feedback">
+                                    {{ $message }}
+                                </div>
+                            @enderror
+                        </div>
+                    @endif
                 </div>
                 <div class="modal-footer">
                     <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>

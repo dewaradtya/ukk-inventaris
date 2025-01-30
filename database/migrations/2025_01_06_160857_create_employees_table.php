@@ -16,6 +16,7 @@ return new class extends Migration
             $table->string('name');
             $table->string('nip')->unique();
             $table->text('address');
+            $table->foreignId('id_user')->constrained('users')->nullable();
             $table->timestamps();
         });
     }

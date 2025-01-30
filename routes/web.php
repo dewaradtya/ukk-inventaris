@@ -7,7 +7,6 @@ use App\Http\Controllers\HomeController;
 use App\Http\Controllers\InfoUserController;
 use App\Http\Controllers\InventoryController;
 use App\Http\Controllers\LevelController;
-use App\Http\Controllers\OfficerController;
 use App\Http\Controllers\RegisterController;
 use App\Http\Controllers\ResetController;
 use App\Http\Controllers\RoomController;
@@ -29,43 +28,17 @@ Route::group(['middleware' => 'auth'], function () {
 	Route::get('dashboard', function () {
 		return view('dashboard');
 	})->name('dashboard');
-
-	Route::get('billing', function () {
-		return view('billing');
-	})->name('billing');
-
-	Route::get('profile', function () {
-		return view('profile');
-	})->name('profile');
-
-	Route::resource('/user-management', UserManagementController::class);
-
-	Route::get('tables', function () {
-		return view('tables');
-	})->name('tables');
-
-	Route::get('virtual-reality', function () {
-		return view('virtual-reality');
-	})->name('virtual-reality');
-
-	Route::get('static-sign-in', function () {
-		return view('static-sign-in');
-	})->name('sign-in');
-
-	Route::get('static-sign-up', function () {
-		return view('static-sign-up');
-	})->name('sign-up');
-
+	
 	Route::middleware(['userakses:Admin'])->group(function () {
 		Route::resource('/type', TypeController::class);
 		Route::get('/type-export', [TypeController::class, 'export'])->name('type.export');
 		Route::resource('/room', RoomController::class);
 		Route::get('/room-export', [RoomController::class, 'export'])->name('room.export');
-		Route::resource('/employee', EmployeeController::class);
-		Route::resource('/officer', OfficerController::class);
 		Route::resource('/level', LevelController::class);
 		Route::resource('/inventory', InventoryController::class);
+		Route::resource('/user-management', UserManagementController::class);
 	});
+	Route::resource('/employee', EmployeeController::class);
 	Route::resource('/borrowing', BorrowingController::class);
 	Route::get('/logout', [SessionsController::class, 'destroy']);
 	Route::get('/user-profile', [InfoUserController::class, 'create']);

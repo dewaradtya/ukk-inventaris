@@ -22,7 +22,7 @@
     <!-- Nucleo Icons -->
     <link href="{{ asset('assets/css/nucleo-icons.css') }}" rel="stylesheet" />
     <link href="{{ asset('assets/css/nucleo-svg.css') }}" rel="stylesheet" />
-    
+
     <!-- CSS Files -->
     <link id="pagestyle" href="{{ asset('assets/css/soft-ui-dashboard.css?v=1.0.3') }}" rel="stylesheet" />
     <link href="{{ asset('assets/css/style.css') }}" rel="stylesheet" />
@@ -38,16 +38,18 @@
     @endguest
 
     @if (session()->has('success'))
-        <div x-data="{ show: true }" x-init="setTimeout(() => show = false, 4000)" x-show="show"
-            class="position-fixed bg-success text-white rounded top-3 end-3 text-sm py-2 px-4 shadow-lg"
+        <div id="success-alert"
+            class="position-fixed alert alert-success text-white rounded top-3 end-3 text-sm py-2 px-4 shadow-lg"
             style="z-index: 1050;">
             <p class="m-0">{{ session('success') }}</p>
         </div>
     @endif
 
     @if (session('error'))
-        <div class="position-fixed alert alert-danger">
-            {{ session('error') }}
+        <div id="error-alert"
+            class="position-fixed alert alert-danger text-white top-3 end-3 text-sm py-2 px-4 shadow-lg"
+            style="z-index: 1050;">
+            <p class="m-0">{{ session('error') }}</p>
         </div>
     @endif
 
@@ -57,6 +59,23 @@
     <script src="{{ asset('assets/js/core/bootstrap.min.js') }}"></script>
     <script src="{{ asset('assets/js/plugins/perfect-scrollbar.min.js') }}"></script>
     <script src="{{ asset('assets/js/plugins/smooth-scrollbar.min.js') }}"></script>
+
+    <script>
+        setTimeout(function() {
+            const successAlert = document.getElementById('success-alert');
+            const errorAlert = document.getElementById('error-alert');
+
+            if (successAlert) {
+                successAlert.style.opacity = '0';
+                setTimeout(() => successAlert.style.display = 'none', 1000);
+            }
+
+            if (errorAlert) {
+                errorAlert.style.opacity = '0';
+                setTimeout(() => errorAlert.style.display = 'none', 1000);
+            }
+        }, 5000);
+    </script>
 
     <script>
         var win = navigator.platform.indexOf('Win') > -1;

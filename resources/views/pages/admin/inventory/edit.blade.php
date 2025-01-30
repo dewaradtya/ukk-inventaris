@@ -118,18 +118,18 @@
                                 </div>
 
                                 <div class="mb-3">
-                                    <label for="id_officer" class="form-label">Petugas</label>
-                                    <select class="form-control @error('id_officer') is-invalid @enderror" id="id_officer"
-                                        name="id_officer">
+                                    <label for="id_user" class="form-label">Petugas</label>
+                                    <select class="form-control @error('id_user') is-invalid @enderror" id="id_user"
+                                        name="id_user">
                                         <option value="" disabled selected>Pilih Petugas</option>
-                                        @foreach ($officers as $officer)
-                                            <option value="{{ $officer->id }}"
-                                                {{ old('id_officer', $inventory->id_officer) == $officer->id ? 'selected' : '' }}>
-                                                {{ $officer->name }}
+                                        @foreach ($users as $user)
+                                            <option value="{{ $user->id }}"
+                                                {{ old('id_user', $inventory->id_user) == $user->id ? 'selected' : '' }}>
+                                                {{ $user->name }}
                                             </option>
                                         @endforeach
                                     </select>
-                                    @error('id_officer')
+                                    @error('id_user')
                                         <div class="invalid-feedback">
                                             {{ $message }}
                                         </div>

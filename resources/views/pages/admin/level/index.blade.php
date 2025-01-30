@@ -22,9 +22,9 @@
                                 <table class="table align-items-center mb-0">
                                     <thead>
                                         <tr>
-                                            <th class="text-uppercase text-secondary text-sm font-weight-bolder opacity-7">
+                                            <th class="text-uppercase text-secondary text-xxs font-weight-bolder opacity-7">
                                                 Name</th>
-                                            <th class="text-uppercase text-secondary text-sm font-weight-bolder opacity-7">
+                                            <th class="text-uppercase text-secondary text-xxs font-weight-bolder opacity-7">
                                                 Actions</th>
                                         </tr>
                                     </thead>
@@ -32,7 +32,7 @@
                                         @forelse ($levels as $level)
                                             <tr>
                                                 <td>
-                                                    <p class="text-sm font-weight-bold mb-0">{{ $level->name }}</p>
+                                                    <p class="text-xs font-weight-bold mb-0">{{ $level->name }}</p>
                                                 </td>
                                                 <td class="align-middle">
                                                     <a href="{{ route('level.edit', $level->id) }}"

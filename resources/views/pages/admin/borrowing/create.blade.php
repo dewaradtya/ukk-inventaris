@@ -3,7 +3,7 @@
     <div class="modal-dialog">
         <div class="modal-content">
             <div class="modal-header">
-                <h5 class="modal-title" id="createBorrowingModalLabel">Create New Borrowing</h5>
+                <h5 class="modal-title" id="createBorrowingModalLabel">Tambah Peminjaman</h5>
                 <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
             </div>
             <form action="{{ route('borrowing.store') }}" method="POST">
@@ -35,7 +35,8 @@
                             name="loan_status">
                             <option value="borrow" {{ old('loan_status') == 'borrow' ? 'selected' : '' }}>Dipinjam
                             </option>
-                            <option value="returned" {{ old('loan_status') == 'returned' ? 'selected' : '' }}>Dikembalikan
+                            <option value="returned" {{ old('loan_status') == 'returned' ? 'selected' : '' }}>
+                                Dikembalikan
                             </option>
                         </select>
                         @error('loan_status')
@@ -44,24 +45,18 @@
                             </div>
                         @enderror
                     </div>
-                    <div class="mb-3">
-                        <label for="id_employee" class="form-label">Pegawai</label>
-                        <select class="form-control @error('id_employee') is-invalid @enderror" id="id_employee"
-                            name="id_employee">
-                            <option value="" disabled selected>Select Pegawai</option>
-                            @foreach ($employees as $employee)
-                                <option value="{{ $employee->id }}"
-                                    {{ old('id_employee') == $employee->id ? 'selected' : '' }}>
-                                    {{ $employee->name }} ({{ $employee->nip }})
-                                </option>
-                            @endforeach
-                        </select>
-                        @error('id_employee')
-                            <div class="invalid-feedback">
-                                {{ $message }}
-                            </div>
-                        @enderror
-                    </div>
+                    @if (auth()->user()->level->name === 'Admin')
+                        <div class="form-group">
+                            <label for="id_employee">Pilih Pegawai</label>
+                            <select name="id_employee" id="id_employee" class="form-control" required>
+                                <option value="">-- Pilih Pegawai --</option>
+                                @foreach ($employees as $employee)
+                                    <option value="{{ $employee->id }}">{{ $employee->name }}</option>
+                                @endforeach
+                            </select>
+                        </div>
+                    @endif
+
                 </div>
                 <div class="modal-footer">
                     <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>

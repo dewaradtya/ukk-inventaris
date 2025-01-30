@@ -3,6 +3,7 @@
 namespace App\Http\Controllers;
 
 use App\Models\Employee;
+use App\Models\User;
 use Illuminate\Http\Request;
 
 class EmployeeController extends Controller
@@ -21,7 +22,16 @@ class EmployeeController extends Controller
 
         $employees = $query->paginate(10);
 
-        return view('pages.admin.employee.index', compact('employees'));
+        $users = [];
+        if (auth()->user()->level->name === 'Admin') {
+            $users = User::doesntHave('employee')
+                ->whereHas('level', function ($query) {
+                    $query->where('name', 'User');
+                })
+                ->get();
+        }
+
+        return view('pages.admin.employee.index', compact('employees', 'users'));
     }
 
     /**
@@ -40,16 +50,34 @@ class EmployeeController extends Controller
         $request->validate([
             'name' => 'required',
             'nip' => 'required|unique:employees',
-            'address' => 'required'
+            'address' => 'required',
         ]);
 
-        $employees = Employee::create([
-            'name' => $request->name,
-            'nip' => $request->nip,
-            'address' => $request->address
-        ]);
+        $userRole = auth()->user()->level->name;
 
-        return redirect()->route('employee.index')->with('success', 'employee berhasil ditambahkan');
+        if ($userRole === 'User') {
+            $user = auth()->user();
+            $employee = Employee::create([
+                'name' => $request->name,
+                'nip' => $request->nip,
+                'address' => $request->address,
+                'id_user' => $user->id,
+            ]);
+        } elseif ($userRole === 'Admin') {
+            $request->validate([
+                'user_id' => 'required|exists:users,id',
+            ]);
+
+            $selectedUser = User::findOrFail($request->user_id);
+            $employee = Employee::create([
+                'name' => $request->name,
+                'nip' => $request->nip,
+                'address' => $request->address,
+                'id_user' => $selectedUser->id,
+            ]);
+        }
+
+        return redirect()->route('employee.index')->with('success', 'Pegawai berhasil ditambahkan');
     }
 
     /**
@@ -66,8 +94,19 @@ class EmployeeController extends Controller
     public function edit(string $id)
     {
         $employee = Employee::findOrFail($id);
+
+        $users = User::whereDoesntHave('employee')
+            ->orWhereHas('employee', function ($query) use ($employee) {
+                $query->where('id', $employee->id);
+            })
+            ->whereHas('level', function ($query) {
+                $query->where('name', 'User');
+            })
+            ->get();
+
         return view('pages.admin.employee.edit', [
             'employee' => $employee,
+            'users' => $users,
         ]);
     }
 
@@ -84,14 +123,28 @@ class EmployeeController extends Controller
 
         $employee = Employee::findOrFail($id);
 
-        $employee->name = $request->name;
-        $employee->nip = $request->nip;
-        $employee->address = $request->address;
-        $employee->save();
+        $employee->update([
+            'name' => $request->name,
+            'nip' => $request->nip,
+            'address' => $request->address,
+        ]);
 
-        return redirect()->route('employee.index')->with('success', 'employee berhasil diperbarui');
+        $userRole = auth()->user()->level->name;
+
+        if ($userRole === 'User') {
+            $user = auth()->user();
+            $employee->update(['id_user' => $user->id]);
+        } elseif ($userRole === 'Admin') {
+            $request->validate([
+                'user_id' => 'required|exists:users,id',
+            ]);
+
+            $selectedUser = User::findOrFail($request->user_id);
+            $employee->update(['id_user' => $selectedUser->id]);
+        }
+
+        return redirect()->route('employee.index')->with('success', 'Pegawai berhasil diperbarui');
     }
-
 
     /**
      * Remove the specified resource from storage.

@@ -13,15 +13,25 @@ class BorrowingController extends Controller
      */
     public function index()
     {
-        $borrowings = Borrowing::all();
+        if (auth()->user()->level->name === 'User') {
+            $employee = Employee::where('id_user', auth()->user()->id)->first();
+
+            if ($employee) {
+                $borrowings = Borrowing::where('id_employee', $employee->id)->get();
+            } else {
+                $borrowings = collect();
+            }
+        } else {
+            $borrowings = Borrowing::all();
+        }
+
         $employees = Employee::all();
-    
+
         return view('pages.admin.borrowing.index', [
             'borrowings' => $borrowings,
             'employees' => $employees,
         ]);
     }
-    
 
     /**
      * Show the form for creating a new resource.
@@ -39,19 +49,32 @@ class BorrowingController extends Controller
      */
     public function store(Request $request)
     {
-        // Validasi input
         $request->validate([
             'borrow_date' => 'required|date',
             'return_date' => 'nullable|date|after_or_equal:borrow_date',
             'loan_status' => 'required|string',
-            'id_employee' => 'required|exists:employees,id',
         ]);
+
+        if (auth()->user()->level->name === 'User') {
+            $employee = Employee::where('id_user', auth()->user()->id)->first();
+
+            if (!$employee) {
+                return redirect()->back()->with('error', 'Mohon isi data pegawai terlebih dahulu.');
+            }
+
+            $idEmployee = $employee->id;
+        } else {
+            $request->validate([
+                'id_employee' => 'required|exists:employees,id',
+            ]);
+            $idEmployee = $request->id_employee;
+        }
 
         Borrowing::create([
             'borrow_date' => $request->borrow_date,
             'return_date' => $request->return_date,
             'loan_status' => $request->loan_status,
-            'id_employee' => $request->id_employee,
+            'id_employee' => $idEmployee,
         ]);
 
         return redirect()->route('borrowing.index')->with('success', 'Borrowing berhasil ditambahkan');
@@ -79,16 +102,30 @@ class BorrowingController extends Controller
             'borrow_date' => 'required|date',
             'return_date' => 'nullable|date|after_or_equal:borrow_date',
             'loan_status' => 'required|string',
-            'id_employee' => 'required|exists:employees,id',
         ]);
 
         $borrowing = Borrowing::findOrFail($id);
+
+        if (auth()->user()->level->name === 'User') {
+            $employee = Employee::where('id_user', auth()->user()->id)->first();
+
+            if (!$employee) {
+                return redirect()->back()->with('error', 'Mohon isi data pegawai terlebih dahulu.');
+            }
+
+            $idEmployee = $employee->id;
+        } else {
+            $request->validate([
+                'id_employee' => 'required|exists:employees,id',
+            ]);
+            $idEmployee = $request->id_employee;
+        }
 
         $borrowing->update([
             'borrow_date' => $request->borrow_date,
             'return_date' => $request->return_date,
             'loan_status' => $request->loan_status,
-            'id_employee' => $request->id_employee,
+            'id_employee' => $idEmployee,
         ]);
 
         return redirect()->route('borrowing.index')->with('success', 'Borrowing berhasil diperbarui');

@@ -5,8 +5,8 @@
                 <div class="copyright text-center text-sm text-muted text-lg-start">
                     © <script>
                         document.write(new Date().getFullYear())
-                    </script>, made with <i class="fa fa-heart"></i> by
-                    <a href="" class="font-weight-bold" target="_blank">Dewa Raditya Rochman</a>
+                    </script>, made with by
+                    <a href="{{route('dashboard')}}" class="font-weight-bold" target="_blank">Dewa Raditya Rochman</a>
                 </div>
             </div>
             <div class="col-lg-6">

@@ -20,7 +20,7 @@ return new class extends Migration
             $table->string('code')->unique();
             $table->foreignId('id_type')->constrained('types');
             $table->foreignId('id_room')->constrained('rooms');
-            $table->foreignId('id_officer')->constrained('officers');
+            $table->foreignId('id_user')->constrained('users');
             $table->timestamps();
         });
     }

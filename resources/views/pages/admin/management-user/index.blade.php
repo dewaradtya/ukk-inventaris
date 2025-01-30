@@ -2,16 +2,6 @@
 
 @section('content')
     <div>
-        <div class="alert alert-secondary mx-4" role="alert">
-            <span class="text-white">
-                <strong>Add, Edit, Delete features are not functional!</strong> This is a
-                <strong>PRO</strong> feature! Click <strong>
-                    <a href="https://www.creative-tim.com/live/soft-ui-dashboard-pro-laravel" target="_blank"
-                        class="text-white">here</a></strong>
-                to see the PRO product!
-            </span>
-        </div>
-
         <div class="row">
             <div class="col-12">
                 <div class="card mb-4 mx-4">
@@ -20,8 +10,22 @@
                             <div>
                                 <h5 class="mb-0">All Users</h5>
                             </div>
-                            <a href="#" class="btn bg-gradient-primary btn-sm mb-0" type="button">+&nbsp; New
-                                User</a>
+                            <div class="d-flex">
+                                <form action="{{ route('user-management.index') }}" method="GET" class="d-flex me-2">
+                                    <div class="input-group">
+                                        <input type="text" name="search" class="form-control form-control-sm"
+                                            placeholder="Cari nama atau email..." value="{{ request('search') }}">
+                                        <span class="input-group-text text-body"><i class="fas fa-search"
+                                                aria-hidden="true"></i></span>
+                                    </div>
+                                </form>
+                                <a href="{{ route('level.index') }}" class="btn bg-gradient-info btn-sm mb-0 me-2">
+                                    Level
+                                </a>
+                                <button href="#" class="btn bg-gradient-primary btn-sm mb-0" data-bs-toggle="modal"
+                                    data-bs-target="#createUserManagementModal">+&nbsp; New
+                                    User</button>
+                            </div>
                         </div>
                     </div>
                     <div class="card-body px-0 pt-0 pb-2">
@@ -66,10 +70,10 @@
                                             </td>
                                             <td>
                                                 <div>
-                                                    <img src="{{ $user->photo_url ?? asset('assets/img/default-avatar.png') }}" 
-                                                         class="avatar avatar-sm me-3">
+                                                    <img src="{{ $user->image ? asset('storage/' . $user->image) : asset('assets/img/default-avatar.jpg') }}"
+                                                        alt="{{ $user->name }}" class="avatar avatar-sm me-3">
                                                 </div>
-                                            </td>
+                                            </td>                                                                                       
                                             <td class="text-center">
                                                 <p class="text-xs font-weight-bold mb-0">{{ $user->name }}</p>
                                             </td>
@@ -77,7 +81,8 @@
                                                 <p class="text-xs font-weight-bold mb-0">{{ $user->email }}</p>
                                             </td>
                                             <td class="text-center">
-                                                <p class="text-xs font-weight-bold mb-0">{{ $user->level->name ?? 'N/A' }}</p>
+                                                <p class="text-xs font-weight-bold mb-0">{{ $user->level->name ?? 'N/A' }}
+                                                </p>
                                             </td>
                                             <td class="text-center">
                                                 <span class="text-secondary text-xs font-weight-bold">
@@ -85,13 +90,20 @@
                                                 </span>
                                             </td>
                                             <td class="text-center">
-                                                <a href="#" class="mx-3" data-bs-toggle="tooltip"
-                                                    data-bs-original-title="Edit user">
+                                                <a href="{{ route('user-management.edit', $user->id) }}" class="mx-3"
+                                                    data-bs-toggle="tooltip" data-bs-original-title="Edit user">
                                                     <i class="fas fa-user-edit text-secondary"></i>
                                                 </a>
-                                                <span>
-                                                    <i class="cursor-pointer fas fa-trash text-secondary"></i>
-                                                </span>
+                                                <form action="{{ route('user-management.destroy', $user->id) }}"
+                                                    method="POST" style="display:inline;">
+                                                    @csrf
+                                                    @method('DELETE')
+                                                    <button type="submit" class="cursor-pointer bg-transparent border-0"
+                                                        onclick="return confirm('Apakah Anda yakin ingin menghapus pengguna ini?')"
+                                                        style="background: none;">
+                                                        <i class="fas fa-trash text-secondary"></i>
+                                                    </button>
+                                                </form>
                                             </td>
                                         </tr>
                                     @empty
@@ -102,9 +114,13 @@
                                 </tbody>
                             </table>
                         </div>
+                        <div class="d-flex justify-content-center mt-3">
+                            {{ $users->withQueryString()->links() }}
+                        </div>
                     </div>
                 </div>
             </div>
         </div>
     </div>
+    @include('pages.admin.management-user.create')
 @endsection

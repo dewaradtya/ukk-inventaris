@@ -46,6 +46,29 @@
                                     @enderror
                                 </div>
 
+                                @if (auth()->user()->level->name === 'Admin')
+                                    <div class="mb-3">
+                                        <label for="user_id">Pilih User</label>
+                                        <select name="user_id" id="user_id"
+                                            class="form-control @error('user_id') is-invalid @enderror">
+                                            <option value="">-- Pilih User --</option>
+                                            @foreach ($users as $user)
+                                                @if ($user->employee->isEmpty() || $user->employee->first()->id === $employee->id)
+                                                    <option value="{{ $user->id }}"
+                                                        {{ old('user_id', $employee->id_user) == $user->id ? 'selected' : '' }}>
+                                                        {{ $user->name }}
+                                                    </option>
+                                                @endif
+                                            @endforeach
+                                        </select>
+                                        @error('user_id')
+                                            <div class="invalid-feedback">
+                                                {{ $message }}
+                                            </div>
+                                        @enderror
+                                    </div>
+                                @endif
+
                                 <div class="card-footer">
                                     <a href="{{ route('employee.index') }}" class="btn btn-secondary">Back</a>
                                     <button type="submit" class="btn btn-primary">Save</button>

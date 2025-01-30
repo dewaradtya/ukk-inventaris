@@ -104,7 +104,7 @@ class TypeController extends Controller
         $type = Type::findOrFail($id);
         $isUsed = Inventory::where('id_type', $id)->exists();
         if ($isUsed) {
-            return redirect()->route('type.index')->withErrors(['error' => 'Data tidak dapat dihapus karena sedang digunakan di Inventory!']);
+            return redirect()->back()->with(['error' => 'Data tidak dapat dihapus karena sedang digunakan di Inventory!']);
         }
         $type->delete();
 

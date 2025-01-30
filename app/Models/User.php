@@ -22,6 +22,7 @@ class User extends Authenticatable
         'email',
         'username',
         'password',
+        'image',
         'id_level',
     ];
 
@@ -48,5 +49,9 @@ class User extends Authenticatable
     {
         return $this->belongsTo(Level::class, 'id_level');
     }
-    
+
+    public function employee()
+    {
+        return $this->hasMany(Employee::class, 'id_user');
+    }    
 }

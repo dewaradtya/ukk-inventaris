@@ -3,7 +3,7 @@
 namespace App\Http\Controllers;
 
 use App\Models\Inventory;
-use App\Models\Officer;
+use App\Models\user;
 use App\Models\Room;
 use App\Models\Type;
 use Illuminate\Http\Request;
@@ -15,7 +15,7 @@ class InventoryController extends Controller
      */
     public function index(Request $request)
     {
-        $query = Inventory::with(['type', 'room', 'officer']);
+        $query = Inventory::with(['type', 'room', 'user']);
 
         if ($request->has('search')) {
             $search = $request->search;
@@ -28,7 +28,7 @@ class InventoryController extends Controller
                     ->orWhereHas('room', function ($q) use ($search) {
                         $q->where('name', 'like', "%{$search}%");
                     })
-                    ->orWhereHas('officer', function ($q) use ($search) {
+                    ->orWhereHas('user', function ($q) use ($search) {
                         $q->where('name', 'like', "%{$search}%");
                     });
             });
@@ -37,9 +37,9 @@ class InventoryController extends Controller
         $inventories = $query->paginate(10);
         $types = Type::all();
         $rooms = Room::all();
-        $officers = Officer::all();
+        $users = User::all();
 
-        return view('pages.admin.inventory.index', compact('inventories', 'types', 'rooms', 'officers'));
+        return view('pages.admin.inventory.index', compact('inventories', 'types', 'rooms', 'users'));
     }
 
     /**
@@ -49,11 +49,11 @@ class InventoryController extends Controller
     {
         $types = Type::all();
         $rooms = Room::all();
-        $officers = Officer::all();
+        $users = User::all();
         return view('pages.admin.inventory.create', [
             'types' => $types,
             'rooms' => $rooms,
-            'officers' => $officers,
+            'users' => $users,
         ]);
     }
 
@@ -70,8 +70,9 @@ class InventoryController extends Controller
             'code' => 'required|string|unique:inventories,code',
             'id_type' => 'required|exists:types,id',
             'id_room' => 'required|exists:rooms,id',
-            'id_officer' => 'required|exists:officers,id',
         ]);
+
+        $userId = auth()->user()->id;
 
         Inventory::create([
             'name' => $request->name,
@@ -81,7 +82,7 @@ class InventoryController extends Controller
             'code' => $request->code,
             'id_type' => $request->id_type,
             'id_room' => $request->id_room,
-            'id_officer' => $request->id_officer,
+            'id_user' => $userId,
         ]);
 
         return redirect()->route('inventory.index')->with('success', 'Inventory berhasil ditambahkan');
@@ -95,12 +96,12 @@ class InventoryController extends Controller
         $inventory = Inventory::findOrFail($id);
         $types = Type::all();
         $rooms = Room::all();
-        $officers = Officer::all();
+        $users = User::all();
         return view('pages.admin.inventory.edit', [
             'inventory' => $inventory,
             'types' => $types,
             'rooms' => $rooms,
-            'officers' => $officers,
+            'users' => $users,
         ]);
     }
 
@@ -117,10 +118,11 @@ class InventoryController extends Controller
             'code' => 'required|unique:rooms,code,' . $id,
             'id_type' => 'required|exists:types,id',
             'id_room' => 'required|exists:rooms,id',
-            'id_officer' => 'required|exists:officers,id',
         ]);
 
         $inventory = Inventory::findOrFail($id);
+
+        $userId = auth()->user()->id;
 
         $inventory->update([
             'name' => $request->name,
@@ -130,10 +132,10 @@ class InventoryController extends Controller
             'code' => $request->code,
             'id_type' => $request->id_type,
             'id_room' => $request->id_room,
-            'id_officer' => $request->id_officer,
+            'id_user' => $userId,
         ]);
 
-        return redirect()->route('inventory.index')->with('success', 'inventory berhasil diperbarui');
+        return redirect()->route('inventory.index')->with('success', 'Inventory berhasil diperbarui');
     }
 
     /**

@@ -49,9 +49,7 @@
               Copyright © <script>
                 document.write(new Date().getFullYear())
               </script> Soft by 
-              <a style="color: #252f40;" href="https://www.creative-tim.com" class="font-weight-bold ml-1" target="_blank">Creative Tim</a>
-              &
-              <a style="color: #252f40;" href="https://www.updivision.com" class="font-weight-bold ml-1" target="_blank">UPDIVISION</a>.
+              <a style="color: #252f40;" href="{{route('dashboard')}}" class="font-weight-bold ml-1" target="_blank">Dewa Raditya Rochman</a>.
             </p>
           </div>
         </div>

@@ -9,7 +9,7 @@
         <div class="row justify-content-center">
           <div class="col-lg-5 text-center mx-auto">
             <h1 class="text-white mb-2 mt-5">Welcome!</h1>
-            <p class="text-lead text-white">Use these awesome forms to login or create new account in your project for free.</p>
+            <p class="text-lead text-white">Please use these forms to create a login or new account for your project free of charge.</p>
           </div>
         </div>
       </div>

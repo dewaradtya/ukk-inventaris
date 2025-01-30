@@ -17,5 +17,4 @@ class Level extends Model
     {
         return $this->hasMany(User::class, 'id_level');
     }
-
 }

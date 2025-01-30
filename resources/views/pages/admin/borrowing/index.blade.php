@@ -20,19 +20,19 @@
                                 <table class="table align-items-center mb-0">
                                     <thead>
                                         <tr>
-                                            <th class="text-uppercase text-secondary text-sm font-weight-bolder opacity-7">
+                                            <th class="text-uppercase text-secondary text-xxs font-weight-bolder opacity-7">
                                                 Tanggal Peminjaman</th>
                                             <th
-                                                class="text-uppercase text-secondary text-sm font-weight-bolder opacity-7 ps-2">
+                                                class="text-uppercase text-secondary text-xxs font-weight-bolder opacity-7 ps-2">
                                                 Tanggal Pengembalian</th>
                                             <th
-                                                class="text-uppercase text-secondary text-sm font-weight-bolder opacity-7 ps-2">
+                                                class="text-uppercase text-secondary text-xxs font-weight-bolder opacity-7 ps-2">
                                                 Status Peminjaman</th>
                                             <th
-                                                class="text-uppercase text-secondary text-sm font-weight-bolder opacity-7 ps-2">
+                                                class="text-uppercase text-secondary text-xxs font-weight-bolder opacity-7 ps-2">
                                                 Pegawai</th>
                                             <th
-                                                class="text-uppercase text-secondary text-sm font-weight-bolder opacity-7 ps-2">
+                                                class="text-uppercase text-secondary text-xxs font-weight-bolder opacity-7 ps-2">
                                                 Aksi</th>
                                         </tr>
                                     </thead>
@@ -42,20 +42,24 @@
                                                 <td>
                                                     <div class="d-flex px-2 py-1">
                                                         <div class="d-flex flex-column justify-content-center">
-                                                            <h6 class="mb-0 text-sm">{{ $borrowing->borrow_date }}</h6>
+                                                            <h6 class="mb-0 text-xs">{{ $borrowing->borrow_date }}</h6>
                                                         </div>
                                                     </div>
                                                 </td>
                                                 <td>
-                                                    <p class="text-sm font-weight-bold mb-0">
+                                                    <p class="text-xs font-weight-bold mb-0">
                                                         {{ $borrowing->return_date ?? '-' }}</p>
                                                 </td>
                                                 <td>
-                                                    <p class="text-sm font-weight-bold mb-0">{{ $borrowing->loan_status }}
+                                                    <p class="text-xs font-weight-bold mb-0">
+                                                        <span class="badge 
+                                                            {{ $borrowing->loan_status === 'borrow' ? 'bg-warning' : 'bg-success' }}">
+                                                            {{ $borrowing->loan_status }}
+                                                        </span>
                                                     </p>
                                                 </td>
                                                 <td>
-                                                    <p class="text-sm mb-0">
+                                                    <p class="text-xs mb-0">
                                                         {{ $borrowing->employee->name ?? 'N/A' }}
                                                     </p>
                                                 </td>
