@@ -40,7 +40,7 @@
                     <ul class="dropdown-menu dropdown-menu-end px-2 py-3 me-sm-n4" aria-labelledby="dropdownMenuButton">
                         <!-- Profile -->
                         <li>
-                            <a class="dropdown-item border-radius-md" href="{{ url('user-profile') }}">
+                            <a class="dropdown-item border-radius-md" href="{{ route('userProfile.create') }}">
                                 <div class="d-flex py-1">
                                     <div class="my-auto">
                                         <i class="fa fa-user me-3"></i>
@@ -56,10 +56,10 @@
                             <a class="dropdown-item border-radius-md" href="{{ url('/logout') }}">
                                 <div class="d-flex py-1">
                                     <div class="my-auto">
-                                        <i class="fa fa-sign-out-alt me-3"></i>
+                                        <i class="fa fa-sign-out-alt text-danger me-3"></i>
                                     </div>
                                     <div class="d-flex flex-column justify-content-center">
-                                        <h6 class="text-sm font-weight-normal mb-1">Logout</h6>
+                                        <h6 class="text-danger text-sm font-weight-normal mb-1">Logout</h6>
                                     </div>
                                 </div>
                             </a>

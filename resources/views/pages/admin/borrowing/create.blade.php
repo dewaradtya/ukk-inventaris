@@ -19,32 +19,25 @@
                             </div>
                         @enderror
                     </div>
-                    <div class="mb-3">
-                        <label for="return_date" class="form-label">Tanggal Pengembalian</label>
-                        <input type="date" class="form-control @error('return_date') is-invalid @enderror"
-                            id="return_date" name="return_date" value="{{ old('return_date') }}" readonly>
-                        @error('return_date')
-                            <div class="invalid-feedback">
-                                {{ $message }}
-                            </div>
-                        @enderror
+
+                    <div id="inventory-container">
+                        <div class="inventory-item mb-3">
+                            <label class="form-label">Pilih Inventaris</label>
+                            <select name="id_inventories[]" class="form-control inventory-select" required>
+                                @foreach ($inventories as $inventory)
+                                    <option value="{{ $inventory->id }}" data-stock="{{ $inventory->amount }}">
+                                        {{ $inventory->name }} (Stok: {{ $inventory->amount }})
+                                    </option>
+                                @endforeach
+                            </select>
+                            <label class="form-label">Jumlah</label>
+                            <input type="number" name="amount[]" class="form-control inventory-amount" min="1" required>
+                            <button type="button" class="btn btn-danger btn-sm remove-inventory">Hapus</button>
+                        </div>
                     </div>
-                    <div class="mb-3">
-                        <label for="loan_status" class="form-label">Status Peminjaman</label>
-                        <select class="form-control @error('loan_status') is-invalid @enderror" id="loan_status"
-                            name="loan_status">
-                            <option value="borrow" {{ old('loan_status') == 'borrow' ? 'selected' : '' }}>Dipinjam
-                            </option>
-                            <option value="returned" {{ old('loan_status') == 'returned' ? 'selected' : '' }}>
-                                Dikembalikan
-                            </option>
-                        </select>
-                        @error('loan_status')
-                            <div class="invalid-feedback">
-                                {{ $message }}
-                            </div>
-                        @enderror
-                    </div>
+
+                    <button type="button" id="add-more-inventory" class="btn btn-sm btn-success">Tambah Inventaris</button>
+
                     @if (auth()->user()->level->name === 'Admin')
                         <div class="form-group">
                             <label for="id_employee">Pilih Pegawai</label>
@@ -56,7 +49,6 @@
                             </select>
                         </div>
                     @endif
-
                 </div>
                 <div class="modal-footer">
                     <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
@@ -66,3 +58,47 @@
         </div>
     </div>
 </div>
+
+<script>
+    document.getElementById('add-more-inventory').addEventListener('click', function() {
+        let inventoryContainer = document.getElementById('inventory-container');
+        let newInput = `
+            <div class="inventory-item mb-3">
+                <label class="form-label">Pilih Inventaris</label>
+                <select name="id_inventories[]" class="form-control inventory-select" required>
+                    @foreach ($inventories as $inventory)
+                        <option value="{{ $inventory->id }}" data-stock="{{ $inventory->amount }}">
+                            {{ $inventory->name }} (Stok: {{ $inventory->amount }})
+                        </option>
+                    @endforeach
+                </select>
+                <label class="form-label">Jumlah</label>
+                <input type="number" name="amount[]" class="form-control inventory-amount" min="1" required>
+                <button type="button" class="btn btn-danger btn-sm remove-inventory">Hapus</button>
+            </div>
+        `;
+        inventoryContainer.insertAdjacentHTML('beforeend', newInput);
+        addRemoveEvent();
+    });
+
+    function addRemoveEvent() {
+        document.querySelectorAll('.remove-inventory').forEach(button => {
+            button.addEventListener('click', function() {
+                this.closest('.inventory-item').remove();
+            });
+        });
+
+        document.querySelectorAll('.inventory-amount').forEach(input => {
+            input.addEventListener('input', function() {
+                let maxStock = this.closest('.inventory-item').querySelector('.inventory-select')
+                    .selectedOptions[0].getAttribute('data-stock');
+                if (parseInt(this.value) > parseInt(maxStock)) {
+                    alert('Jumlah melebihi stok yang tersedia!');
+                    this.value = maxStock;
+                }
+            });
+        });
+    }
+
+    addRemoveEvent();
+</script>

@@ -6,7 +6,7 @@
                     © <script>
                         document.write(new Date().getFullYear())
                     </script>, made with by
-                    <a href="{{route('dashboard')}}" class="font-weight-bold" target="_blank">Dewa Raditya Rochman</a>
+                    <a href="{{route('dashboard.index')}}" class="font-weight-bold" target="_blank">Dewa Raditya Rochman</a>
                 </div>
             </div>
             <div class="col-lg-6">

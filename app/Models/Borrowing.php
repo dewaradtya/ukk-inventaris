@@ -21,4 +21,10 @@ class Borrowing extends Model
     {
         return $this->belongsTo(Employee::class, 'id_employee');
     }
+
+
+    public function loanDetails()
+    {
+        return $this->hasMany(LoanDetail::class, 'id_borrowing');
+    }
 }

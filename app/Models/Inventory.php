@@ -33,4 +33,10 @@ class Inventory extends Model
     {
         return $this->belongsTo(User::class, 'id_user');
     }
+
+    public function decreaseStock($amount)
+    {
+        $this->amount -= $amount;
+        $this->save();
+    }
 }

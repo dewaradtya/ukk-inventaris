@@ -2,6 +2,7 @@
 
 use App\Http\Controllers\BorrowingController;
 use App\Http\Controllers\ChangePasswordController;
+use App\Http\Controllers\DashboardController;
 use App\Http\Controllers\EmployeeController;
 use App\Http\Controllers\HomeController;
 use App\Http\Controllers\InfoUserController;
@@ -25,10 +26,8 @@ Route::get('home', function () {
 Route::group(['middleware' => 'auth'], function () {
 
 
-	Route::get('dashboard', function () {
-		return view('dashboard');
-	})->name('dashboard');
-	
+	Route::resource('dashboard', DashboardController::class);
+
 	Route::middleware(['userakses:Admin'])->group(function () {
 		Route::resource('/type', TypeController::class);
 		Route::get('/type-export', [TypeController::class, 'export'])->name('type.export');
@@ -40,9 +39,11 @@ Route::group(['middleware' => 'auth'], function () {
 	});
 	Route::resource('/employee', EmployeeController::class);
 	Route::resource('/borrowing', BorrowingController::class);
+	Route::put('/borrowing/{id}/update-status', [BorrowingController::class, 'updateStatus'])->name('borrowing.updateStatus');
 	Route::get('/logout', [SessionsController::class, 'destroy']);
-	Route::get('/user-profile', [InfoUserController::class, 'create']);
+	Route::get('/user-profile', [InfoUserController::class, 'create'])->name('userProfile.create');
 	Route::post('/user-profile', [InfoUserController::class, 'store']);
+	Route::post('/user-profile/update-image', [InfoUserController::class, 'updateImage'])->name('profile.update.image');
 	Route::get('/login', function () {
 		return view('dashboard');
 	})->name('sign-up');

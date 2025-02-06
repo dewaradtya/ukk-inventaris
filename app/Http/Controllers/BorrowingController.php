@@ -3,7 +3,9 @@
 namespace App\Http\Controllers;
 
 use App\Models\Borrowing;
-use App\Models\Employee; // Pastikan Employee model diimport
+use App\Models\Employee;
+use App\Models\Inventory;
+use App\Models\LoanDetail;
 use Illuminate\Http\Request;
 
 class BorrowingController extends Controller
@@ -13,23 +15,22 @@ class BorrowingController extends Controller
      */
     public function index()
     {
-        if (auth()->user()->level->name === 'User') {
-            $employee = Employee::where('id_user', auth()->user()->id)->first();
+        $user = auth()->user();
 
-            if ($employee) {
-                $borrowings = Borrowing::where('id_employee', $employee->id)->get();
-            } else {
-                $borrowings = collect();
-            }
+        if ($user->level->name === 'User') {
+            $employee = Employee::where('id_user', $user->id)->first();
+
+            $borrowings = $employee
+                ? Borrowing::where('id_employee', $employee->id)->with('employee')->paginate(10)
+                : Borrowing::where('id', null)->paginate(10);
         } else {
-            $borrowings = Borrowing::all();
+            $borrowings = Borrowing::with('employee')->paginate(10);
         }
 
-        $employees = Employee::all();
-
         return view('pages.admin.borrowing.index', [
-            'borrowings' => $borrowings,
-            'employees' => $employees,
+            'borrowings'  => $borrowings,
+            'employees'   => Employee::all(),
+            'inventories' => Inventory::all(),
         ]);
     }
 
@@ -51,17 +52,17 @@ class BorrowingController extends Controller
     {
         $request->validate([
             'borrow_date' => 'required|date',
-            'return_date' => 'nullable|date|after_or_equal:borrow_date',
-            'loan_status' => 'required|string',
+            'id_inventories' => 'required|array',
+            'id_inventories.*' => 'exists:inventories,id',
+            'amount' => 'required|array',
+            'amount.*' => 'integer|min:1',
         ]);
 
         if (auth()->user()->level->name === 'User') {
             $employee = Employee::where('id_user', auth()->user()->id)->first();
-
             if (!$employee) {
                 return redirect()->back()->with('error', 'Mohon isi data pegawai terlebih dahulu.');
             }
-
             $idEmployee = $employee->id;
         } else {
             $request->validate([
@@ -70,14 +71,28 @@ class BorrowingController extends Controller
             $idEmployee = $request->id_employee;
         }
 
-        Borrowing::create([
+        $returnDate = date('Y-m-d', strtotime($request->borrow_date . ' +7 days'));
+
+        $borrowing = Borrowing::create([
             'borrow_date' => $request->borrow_date,
-            'return_date' => $request->return_date,
-            'loan_status' => $request->loan_status,
+            'return_date' => $returnDate,
+            'loan_status' => 'borrow',
             'id_employee' => $idEmployee,
         ]);
 
-        return redirect()->route('borrowing.index')->with('success', 'Borrowing berhasil ditambahkan');
+        foreach ($request->id_inventories as $key => $inventoryId) {
+            LoanDetail::create([
+                'id_borrowing' => $borrowing->id,
+                'id_inventories' => $inventoryId,
+                'amount' => $request->amount[$key],
+            ]);
+
+            $inventory = Inventory::find($inventoryId);
+            $inventory->amount -= $request->amount[$key];
+            $inventory->save();
+        }
+
+        return redirect()->route('borrowing.index')->with('success', 'Borrowing dan Loan Detail berhasil ditambahkan');
     }
 
     /**
@@ -87,11 +102,15 @@ class BorrowingController extends Controller
     {
         $borrowing = Borrowing::findOrFail($id);
         $employees = Employee::all();
+        $inventories = Inventory::all();
+
         return view('pages.admin.borrowing.edit', [
             'borrowing' => $borrowing,
             'employees' => $employees,
+            'inventories' => $inventories,
         ]);
     }
+
 
     /**
      * Update the specified resource in storage.
@@ -101,7 +120,10 @@ class BorrowingController extends Controller
         $request->validate([
             'borrow_date' => 'required|date',
             'return_date' => 'nullable|date|after_or_equal:borrow_date',
-            'loan_status' => 'required|string',
+            'id_inventories' => 'required|array',
+            'id_inventories.*' => 'exists:inventories,id',
+            'amount' => 'required|array',
+            'amount.*' => 'integer|min:1',
         ]);
 
         $borrowing = Borrowing::findOrFail($id);
@@ -121,12 +143,36 @@ class BorrowingController extends Controller
             $idEmployee = $request->id_employee;
         }
 
+        foreach ($borrowing->loanDetails as $loanDetail) {
+            $inventory = Inventory::find($loanDetail->id_inventories);
+            if ($inventory) {
+                $inventory->increment('amount', $loanDetail->amount);
+            }
+        }
+
+        $borrowing->loanDetails()->delete();
+
         $borrowing->update([
             'borrow_date' => $request->borrow_date,
             'return_date' => $request->return_date,
-            'loan_status' => $request->loan_status,
             'id_employee' => $idEmployee,
         ]);
+
+        foreach ($request->id_inventories as $index => $inventoryId) {
+            $amount = $request->amount[$index];
+            $inventory = Inventory::find($inventoryId);
+
+            if ($inventory && $inventory->amount >= $amount) {
+                $inventory->decrement('amount', $amount);
+            } else {
+                return redirect()->back()->with('error', 'Stok inventaris tidak mencukupi.');
+            }
+
+            $borrowing->loanDetails()->create([
+                'id_inventories' => $inventoryId,
+                'amount' => $amount,
+            ]);
+        }
 
         return redirect()->route('borrowing.index')->with('success', 'Borrowing berhasil diperbarui');
     }
@@ -137,8 +183,39 @@ class BorrowingController extends Controller
     public function destroy(string $id)
     {
         $borrowing = Borrowing::findOrFail($id);
+        foreach ($borrowing->loanDetails as $loanDetail) {
+            $inventory = Inventory::find($loanDetail->id_inventories);
+
+            $inventory->increment('amount', $loanDetail->amount);
+        }
+
+        $borrowing->loanDetails()->delete();
+
         $borrowing->delete();
 
         return redirect()->route('borrowing.index')->with('success', 'Data berhasil dihapus!');
+    }
+
+    public function updateStatus(Request $request, $id)
+    {
+        $borrowing = Borrowing::findOrFail($id);
+
+        if (!in_array($request->loan_status, ['borrow', 'return'])) {
+            return response()->json(['success' => false], 400);
+        }
+
+        if ($request->loan_status === 'return' && $borrowing->loan_status !== 'return') {
+            foreach ($borrowing->loanDetails as $loanDetail) {
+                $inventory = Inventory::find($loanDetail->id_inventories);
+                if ($inventory) {
+                    $inventory->increment('amount', $loanDetail->amount);
+                }
+            }
+        }
+
+        $borrowing->loan_status = $request->loan_status;
+        $borrowing->save();
+
+        return redirect()->route('borrowing.index')->with('success', 'Borrowing berhasil diperbarui');
     }
 }
