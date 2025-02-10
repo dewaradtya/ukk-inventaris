@@ -6,41 +6,60 @@ use Maatwebsite\Excel\Concerns\FromCollection;
 use Maatwebsite\Excel\Concerns\WithHeadings;
 use Maatwebsite\Excel\Concerns\ShouldAutoSize;
 use Maatwebsite\Excel\Concerns\WithStyles;
+use Maatwebsite\Excel\Concerns\WithMapping;
 use PhpOffice\PhpSpreadsheet\Worksheet\Worksheet;
 use PhpOffice\PhpSpreadsheet\Style\Border;
 use PhpOffice\PhpSpreadsheet\Style\Fill;
 
-class RoomExport implements FromCollection, WithHeadings, ShouldAutoSize, WithStyles
+class InventoryExport implements FromCollection, WithHeadings, ShouldAutoSize, WithStyles, WithMapping
 {
-    protected $rooms;
+    protected $inventorys;
 
-    public function __construct($rooms)
+    public function __construct($inventorys)
     {
-        $this->rooms = $rooms;
+        $this->inventorys = $inventorys;
     }
 
     public function collection()
     {
-        return $this->rooms;
+        return $this->inventorys;
     }
 
     public function headings(): array
     {
-        return ["Name", "Code", "Information"];
+        return [
+            "Name",
+            "Condition",
+            "Amount",
+            "Register Date",
+            "Code",
+            "Type",
+            "Room",
+            "User"
+        ];
     }
 
-    public function title(): string
+    public function map($inventory): array
     {
-        return 'Ruang Inventaris';
+        return [
+            $inventory->name,
+            $inventory->condition,
+            $inventory->amount,
+            $inventory->register_date,
+            $inventory->code,
+            $inventory->type->name ?? 'N/A',
+            $inventory->room->name ?? 'N/A',
+            $inventory->user->name ?? 'N/A',
+        ];
     }
 
     public function styles(Worksheet $sheet)
     {
         $lastRow = $sheet->getHighestRow();
         $lastColumn = $sheet->getHighestColumn();
-        
-        $sheet->setTitle('Ruang Inventaris');
-        
+
+        $sheet->setTitle('Inventaris');
+
         return [
             1 => [
                 'font' => [
@@ -57,7 +76,6 @@ class RoomExport implements FromCollection, WithHeadings, ShouldAutoSize, WithSt
                     'vertical' => 'center',
                 ],
             ],
-            
             'A2:' . $lastColumn . $lastRow => [
                 'alignment' => [
                     'horizontal' => 'center',
@@ -67,7 +85,6 @@ class RoomExport implements FromCollection, WithHeadings, ShouldAutoSize, WithSt
                     'size' => 11,
                 ],
             ],
-
             'A1:' . $lastColumn . $lastRow => [
                 'borders' => [
                     'allBorders' => [
@@ -81,11 +98,5 @@ class RoomExport implements FromCollection, WithHeadings, ShouldAutoSize, WithSt
                 ],
             ],
         ];
-    }
-
-    public function beforeExport(Worksheet $sheet)
-    {
-        $sheet->getDefaultRowDimension()->setRowHeight(20);
-        $sheet->freezePane('A2');
     }
 }

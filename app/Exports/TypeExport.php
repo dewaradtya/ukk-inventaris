@@ -13,48 +13,35 @@ use PhpOffice\PhpSpreadsheet\Style\Fill;
 
 class TypeExport implements FromCollection, WithHeadings, ShouldAutoSize, WithStyles
 {
-    /**
-    * @return \Illuminate\Support\Collection
-    */
-    public function collection()
+    protected $types;
+
+    public function __construct($types)
     {
-        return Type::select("id", "name", "code", "information")->get();
-    }
-    
-    /**
-     * Add table headings.
-     *
-     * @return array
-     */
-    public function headings(): array
-    {
-        return ["ID", "Name", "Code", "Information"];
+        $this->types = $types;
     }
 
-    /**
-     * Set title for the sheet.
-     *
-     * @return string
-     */
+    public function collection()
+    {
+        return $this->types;
+    }
+
+    public function headings(): array
+    {
+        return ["Name", "Code", "Information"];
+    }
+
     public function title(): string
     {
         return 'Jenis Inventaris';
     }
 
-    /**
-     * Apply styles to the worksheet.
-     *
-     * @param Worksheet $sheet
-     * @return array
-     */
     public function styles(Worksheet $sheet)
     {
         $lastRow = $sheet->getHighestRow();
-        
         $lastColumn = $sheet->getHighestColumn();
-        
+
         $sheet->setTitle('Jenis Inventaris');
-        
+
         return [
             1 => [
                 'font' => [
@@ -71,7 +58,7 @@ class TypeExport implements FromCollection, WithHeadings, ShouldAutoSize, WithSt
                     'vertical' => 'center',
                 ],
             ],
-            
+
             'A2:' . $lastColumn . $lastRow => [
                 'alignment' => [
                     'horizontal' => 'center',
@@ -97,14 +84,9 @@ class TypeExport implements FromCollection, WithHeadings, ShouldAutoSize, WithSt
         ];
     }
 
-    /**
-     * @param Worksheet $sheet
-     * @return void
-     */
     public function beforeExport(Worksheet $sheet)
     {
         $sheet->getDefaultRowDimension()->setRowHeight(20);
-        
         $sheet->freezePane('A2');
     }
 }

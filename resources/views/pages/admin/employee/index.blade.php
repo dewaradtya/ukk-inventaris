@@ -38,37 +38,33 @@
                                         <thead>
                                             <tr>
                                                 <th
-                                                    class="text-uppercase text-secondary text-xxs font-weight-bolder opacity-7">
+                                                    class="text-center text-secondary text-xxs font-weight-bolder opacity-7">
                                                     Nama</th>
                                                 <th
-                                                    class="text-uppercase text-secondary text-xxs font-weight-bolder opacity-7 ps-2">
+                                                    class="text-center text-secondary text-xxs font-weight-bolder opacity-7 ps-2">
                                                     NIP</th>
                                                 <th
-                                                    class="text-uppercase text-secondary text-xxs font-weight-bolder opacity-7 ps-2">
+                                                    class="text-center text-secondary text-xxs font-weight-bolder opacity-7 ps-2">
                                                     Alamat</th>
                                                 <th
-                                                    class="text-uppercase text-secondary text-xxs font-weight-bolder opacity-7 ps-2">
+                                                    class="text-center text-secondary text-xxs font-weight-bolder opacity-7 ps-2">
                                                     Aksi</th>
                                             </tr>
                                         </thead>
                                         <tbody>
                                             @foreach ($employees as $employee)
                                                 <tr>
-                                                    <td>
-                                                        <div class="d-flex px-2 py-1">
-                                                            <div class="d-flex flex-column justify-content-center">
-                                                                <h6 class="mb-0 text-xs">{{ $employee->name }}</h6>
-                                                            </div>
-                                                        </div>
+                                                    <td class="text-center">
+                                                        <p class="text-xs font-weight-bold mb-0">{{ $employee->name }}</p>
                                                     </td>
-                                                    <td>
+                                                    <td class="text-center">
                                                         <p class="text-xs font-weight-bold mb-0">{{ $employee->nip }}</p>
                                                     </td>
-                                                    <td>
+                                                    <td class="text-center">
                                                         <p class="text-xs font-weight-bold mb-0">{{ $employee->address }}
                                                         </p>
                                                     </td>
-                                                    <td class="align-middle">
+                                                    <td class="text-center">
                                                         <a href="{{ route('employee.edit', $employee->id) }}"
                                                             class="btn btn-outline-primary p-2">
                                                             <i class="fa fa-pen text-primary fa-lg" data-bs-toggle="tooltip"
@@ -99,50 +95,84 @@
                     </div>
                 </div>
             @else
-                <div class="row">
-                    <div class="col-12">
-                        <div class="card shadow-sm mb-4">
-                            <div class="card-header bg-primary pb-2">
-                                <h6 class="card-title text-white mb-0">Profil Anda</h6>
+                <div class="row justify-content-center">
+                    <div class="col-md-8 col-lg-6">
+                        <div class="card border-0 shadow-lg">
+                            <div class="card-header bg-primary text-white text-center position-relative py-4">
+                                <div class="position-absolute top-0 start-0 p-3">
+                                    <i class="fas fa-user fs-4"></i>
+                                </div>
+                                <h5 class="mb-0 text-white">KARTU PEGAWAI</h5>
                             </div>
+
                             <div class="card-body">
-                                <div class="d-flex justify-content-center">
-                                    <div class="card w-75">
-                                        <div class="card-header text-center bg-light">
-                                            <h5 class="mb-0">
-                                                {{ auth()->user()->employee->first() ? auth()->user()->employee->first()->name : 'Data Name belum tersedia' }}
-                                            </h5>
+                                <div class="text-center mb-4">
+                                    <div class="position-relative d-inline-block">
+                                        <div class="rounded-circle overflow-hidden border border-4 border-primary shadow-sm"
+                                            style="width: 120px; height: 120px;">
+                                            <img src="{{ auth()->user()->image ? asset('storage/' . auth()->user()->image) : asset('assets/img/default-avatar.jpg') }}" alt="Profile Picture" class="img-fluid">
                                         </div>
-                                        <div class="card-body">
-                                            <div class="row">
-                                                <div class="col-4 text-right font-weight-bold">NIP:</div>
-                                                <div class="col-8">
-                                                    {{ auth()->user()->employee->first() ? auth()->user()->employee->first()->nip : 'Data NIP belum tersedia' }}
+                                        <div class="position-absolute bottom-0 end-0">
+                                            <span class="badge rounded-pill bg-success">
+                                                <i class="fas fa-check-circle"></i> Active
+                                            </span>
+                                        </div>
+                                    </div>
+
+                                    <h4 class="mt-3 mb-1">
+                                        {{ auth()->user()->employee->first() ? auth()->user()->employee->first()->name : 'Data Name belum tersedia' }}
+                                    </h4>
+                                </div>
+
+                                <div class="border-top pt-3">
+                                    <div class="row g-3">
+                                        <div class="col-12">
+                                            <div class="d-flex align-items-center">
+                                                <div class="flex-shrink-0">
+                                                    <i class="fas fa-id-card text-primary me-2"></i>
+                                                </div>
+                                                <div class="flex-grow-1">
+                                                    <small class="text-muted">NIP</small>
+                                                    <div class="fw-bold">
+                                                        {{ auth()->user()->employee->first() ? auth()->user()->employee->first()->nip : 'Data NIP belum tersedia' }}
+                                                    </div>
                                                 </div>
                                             </div>
-                                            <div class="row mt-2">
-                                                <div class="col-4 text-right font-weight-bold">Alamat:</div>
-                                                <div class="col-8">
-                                                    {{ auth()->user()->employee->first() ? auth()->user()->employee->first()->address : 'Data Alamat belum tersedia' }}
+                                        </div>
+
+                                        <div class="col-12">
+                                            <div class="d-flex align-items-center">
+                                                <div class="flex-shrink-0">
+                                                    <i class="fas fa-location-dot text-primary me-2"></i>
+                                                </div>
+                                                <div class="flex-grow-1">
+                                                    <small class="text-muted">Alamat</small>
+                                                    <div class="fw-bold">
+                                                        {{ auth()->user()->employee->first() ? auth()->user()->employee->first()->address : 'Data Alamat belum tersedia' }}
+                                                    </div>
                                                 </div>
                                             </div>
                                         </div>
                                     </div>
                                 </div>
 
-                                <div class="mt-3 text-center">
+                                <div class="text-center mt-4">
                                     @if (auth()->user()->employee && auth()->user()->employee->first())
                                         <a href="{{ route('employee.edit', auth()->user()->employee->first()->id) }}"
-                                            class="btn btn-warning btn-sm mb-0">
-                                            Edit Pegawai
+                                            class="btn btn-warning btn-sm"> Edit Pegawai
                                         </a>
                                     @else
-                                        <button class="btn btn-success btn-sm mb-0" data-bs-toggle="modal"
-                                            data-bs-target="#createEmployeeModal">
-                                            Tambah Pegawai
+                                        <button class="btn btn-success btn-sm" data-bs-toggle="modal"
+                                            data-bs-target="#createEmployeeModal">Tambah Pegawai
                                         </button>
                                     @endif
                                 </div>
+                            </div>
+
+                            <div class="card-footer bg-light text-center py-2">
+                                <small class="text-muted">
+                                    <i class="fas fa-shield-alt me-1"></i> ID Card Valid until 2025
+                                </small>
                             </div>
                         </div>
                     </div>

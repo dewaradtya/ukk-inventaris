@@ -112,8 +112,17 @@ class TypeController extends Controller
     }
 
 
-    public function export()
+    public function export(Request $request)
     {
-        return Excel::download(new TypeExport, 'Jenis Inventaris.xlsx');
+        $typeIds = $request->query('ids');
+
+        if ($typeIds) {
+            $typeIdsArray = explode(',', $typeIds);
+            $types = Type::whereIn('id', $typeIdsArray)->get(['name', 'code', 'information']);
+        } else {
+            $types = Type::all(['name', 'code', 'information']);
+        }
+
+        return Excel::download(new TypeExport($types), 'Jenis Inventaris.xlsx');
     }
 }

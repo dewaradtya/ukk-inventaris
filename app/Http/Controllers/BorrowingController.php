@@ -6,6 +6,7 @@ use App\Models\Borrowing;
 use App\Models\Employee;
 use App\Models\Inventory;
 use App\Models\LoanDetail;
+use Barryvdh\DomPDF\Facade\Pdf;
 use Illuminate\Http\Request;
 
 class BorrowingController extends Controller
@@ -17,14 +18,19 @@ class BorrowingController extends Controller
     {
         $user = auth()->user();
 
-        if ($user->level->name === 'User') {
+        if ($user->level->name === 'Peminjam') {
             $employee = Employee::where('id_user', $user->id)->first();
 
             $borrowings = $employee
-                ? Borrowing::where('id_employee', $employee->id)->with('employee')->paginate(10)
+                ? Borrowing::where('id_employee', $employee->id)
+                ->where('loan_status', 'borrow')
+                ->with('employee')
+                ->paginate(10)
                 : Borrowing::where('id', null)->paginate(10);
         } else {
-            $borrowings = Borrowing::with('employee')->paginate(10);
+            $borrowings = Borrowing::where('loan_status', 'borrow')
+                ->with('employee')
+                ->paginate(10);
         }
 
         return view('pages.admin.borrowing.index', [
@@ -58,7 +64,7 @@ class BorrowingController extends Controller
             'amount.*' => 'integer|min:1',
         ]);
 
-        if (auth()->user()->level->name === 'User') {
+        if (auth()->user()->level->name === 'Peminjam') {
             $employee = Employee::where('id_user', auth()->user()->id)->first();
             if (!$employee) {
                 return redirect()->back()->with('error', 'Mohon isi data pegawai terlebih dahulu.');
@@ -128,7 +134,7 @@ class BorrowingController extends Controller
 
         $borrowing = Borrowing::findOrFail($id);
 
-        if (auth()->user()->level->name === 'User') {
+        if (auth()->user()->level->name === 'Peminjam') {
             $employee = Employee::where('id_user', auth()->user()->id)->first();
 
             if (!$employee) {
@@ -217,5 +223,14 @@ class BorrowingController extends Controller
         $borrowing->save();
 
         return redirect()->route('borrowing.index')->with('success', 'Borrowing berhasil diperbarui');
+    }
+
+    public function proof(string $id)
+    {
+        $borrowing = Borrowing::with('employee', 'loanDetails.inventory')->findOrFail($id);
+
+        $pdf = Pdf::loadView('pages.admin.borrowing.proof', compact('borrowing'));
+
+        return $pdf->stream('bukti_peminjaman.pdf');
     }
 }

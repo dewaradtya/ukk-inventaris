@@ -74,9 +74,9 @@
                                             <td>
                                                 <div>
                                                     <img src="{{ $user->image ? asset('storage/' . $user->image) : asset('assets/img/default-avatar.jpg') }}"
-                                                        alt="{{ $user->name }}" class="avatar avatar-sm me-3">
+                                                        alt="{{ $user->name }}" class="avatar avatar-sm me-3 rounded-circle">
                                                 </div>
-                                            </td>
+                                            </td>                                            
                                             <td class="text-center">
                                                 <p class="text-xs font-weight-bold mb-0">{{ $user->name }}</p>
                                             </td>

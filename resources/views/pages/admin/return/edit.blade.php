@@ -15,12 +15,12 @@
                                 @method('PUT')
                                 <div class="row">
                                     <div class="col-md-6">
-                                        <div class="form-floating mb-3">
+                                        <div class="mb-3">
+                                            <label for="borrow_date" class="form-label">Tanggal Peminjaman</label>
                                             <input type="date"
                                                 class="form-control @error('borrow_date') is-invalid @enderror"
                                                 id="borrow_date" name="borrow_date"
                                                 value="{{ old('borrow_date', $borrowing->borrow_date) }}">
-                                            <label for="borrow_date">Tanggal Peminjaman</label>
                                             @error('borrow_date')
                                                 <div class="invalid-feedback">{{ $message }}</div>
                                             @enderror
@@ -28,12 +28,12 @@
                                     </div>
 
                                     <div class="col-md-6">
-                                        <div class="form-floating mb-3">
+                                        <div class="mb-3">
+                                            <label for="return_date" class="form-label">Tanggal Pengembalian</label>
                                             <input type="date"
                                                 class="form-control @error('return_date') is-invalid @enderror"
                                                 id="return_date" name="return_date"
                                                 value="{{ old('return_date', $borrowing->return_date) }}">
-                                            <label for="return_date" class="form-label">Tanggal Pengembalian</label>
                                             @error('return_date')
                                                 <div class="invalid-feedback">{{ $message }}</div>
                                             @enderror
@@ -70,7 +70,8 @@
                                                             <option value="{{ $inventory->id }}"
                                                                 data-stock="{{ $inventory->amount }}"
                                                                 {{ $inventory->id == $loanDetail->id_inventories ? 'selected' : '' }}>
-                                                                {{ $inventory->name }} (Stok: {{ $inventory->amount }})
+                                                                {{ $inventory->name }} (Stok:
+                                                                {{ $inventory->amount }})
                                                             </option>
                                                         @endforeach
                                                     </select>
@@ -86,20 +87,21 @@
                                             </div>
                                         @endforeach
                                     </div>
-                                </div>
 
-                                <button type="button" id="add-more-inventory" class="btn btn-sm btn-success">Tambah
-                                    Inventaris</button>
+                                    <button type="button" id="add-more-inventory" class="btn btn-sm btn-success">Tambah
+                                        Inventaris</button>
 
-                                <div class="card-footer">
-                                    <a href="{{ route('borrowing.index') }}" class="btn btn-secondary">Kembali</a>
-                                    <button type="submit" class="btn btn-primary">Simpan</button>
+                                    <div class="card-footer">
+                                        <a href="{{ route('borrowing.index') }}" class="btn btn-secondary">Kembali</a>
+                                        <button type="submit" class="btn btn-primary">Simpan</button>
+                                    </div>
                                 </div>
                             </form>
                         </div>
                     </div>
                 </div>
             </div>
+        </div>
     </main>
 
     <script>

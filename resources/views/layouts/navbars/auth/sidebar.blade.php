@@ -22,9 +22,9 @@
                 </a>
             </li>
             <li class="nav-item mt-2">
-                <h6 class="ps-4 ms-2 text-uppercase text-xs font-weight-bolder opacity-6">Pages</h6>
+                <h6 class="ps-4 ms-2 text-uppercase text-xs font-weight-bolder opacity-6">Master</h6>
             </li>
-           @if (Auth::check() && Auth::user()->level->name === 'Admin')
+            @if (Auth::check() && Auth::user()->level->name === 'Admin')
                 <li class="nav-item">
                     <a class="nav-link {{ Request::is('type') ? 'active' : '' }}" href="{{ url('type') }}">
                         <div
@@ -37,7 +37,7 @@
                 </li>
             @endif
 
-           @if (Auth::check() && Auth::user()->level->name === 'Admin')
+            @if (Auth::check() && Auth::user()->level->name === 'Admin')
                 <li class="nav-item">
                     <a class="nav-link {{ Request::is('room') ? 'active' : '' }}" href="{{ url('room') }}">
                         <div
@@ -46,6 +46,21 @@
                                 aria-hidden="true"></i>
                         </div>
                         <span class="nav-link-text ms-1">Ruang Inventaris</span>
+                    </a>
+                </li>
+            @endif
+
+
+
+            @if (Auth::check() && Auth::user()->level->name === 'Admin')
+                <li class="nav-item">
+                    <a class="nav-link {{ Request::is('inventory') ? 'active' : '' }}" href="{{ url('inventory') }}">
+                        <div
+                            class="icon icon-shape icon-sm shadow border-radius-md bg-white text-center me-2 d-flex align-items-center justify-content-center">
+                            <i class="fas fa-boxes ps-2 pe-2 text-center text-dark {{ Request::is('inventory') ? 'text-white' : 'text-dark' }} "
+                                aria-hidden="true"></i>
+                        </div>
+                        <span class="nav-link-text ms-1">Inventaris</span>
                     </a>
                 </li>
             @endif
@@ -61,6 +76,10 @@
                 </a>
             </li>
 
+            <li class="nav-item mt-2">
+                <h6 class="ps-4 ms-2 text-uppercase text-xs font-weight-bolder opacity-6">Transaksi</h6>
+            </li>
+
             <li class="nav-item">
                 <a class="nav-link {{ Request::is('borrowing') ? 'active' : '' }}" href="{{ url('borrowing') }}">
                     <div
@@ -72,26 +91,22 @@
                 </a>
             </li>
 
-           @if (Auth::check() && Auth::user()->level->name === 'Admin')
-                <li class="nav-item">
-                    <a class="nav-link {{ Request::is('inventory') ? 'active' : '' }}" href="{{ url('inventory') }}">
-                        <div
-                            class="icon icon-shape icon-sm shadow border-radius-md bg-white text-center me-2 d-flex align-items-center justify-content-center">
-                            <i class="fas fa-boxes ps-2 pe-2 text-center text-dark {{ Request::is('inventory') ? 'text-white' : 'text-dark' }} "
-                                aria-hidden="true"></i>
-                        </div>
-                        <span class="nav-link-text ms-1">Inventaris</span>
-                    </a>
-                </li>
-            @endif
+            <li class="nav-item">
+                <a class="nav-link {{ Request::is('return') ? 'active' : '' }}" href="{{ url('return') }}">
+                    <div
+                        class="icon icon-shape icon-sm shadow border-radius-md bg-white text-center me-2 d-flex align-items-center justify-content-center">
+                        <i class="fas fa-book ps-2 pe-2 text-center text-dark {{ Request::is('return') ? 'text-white' : 'text-dark' }} "
+                            aria-hidden="true"></i>
+                    </div>
+                    <span class="nav-link-text ms-1">Pengembalian</span>
+                </a>
+            </li>
 
-           @if (Auth::check() && Auth::user()->level->name === 'Admin')
-                <li class="nav-item mt-2">
-                    <h6 class="ps-4 ms-2 text-uppercase text-xs font-weight-bolder opacity-6">Account Pages</h6>
-                </li>
-            @endif
+            <li class="nav-item mt-2">
+                <h6 class="ps-4 ms-2 text-uppercase text-xs font-weight-bolder opacity-6">Lainnya</h6>
+            </li>
 
-           @if (Auth::check() && Auth::user()->level->name === 'Admin')
+            @if (Auth::check() && Auth::user()->level->name === 'Admin')
                 <li class="nav-item pb-2">
                     <a class="nav-link {{ Request::is('user-management') ? 'active' : '' }}"
                         href="{{ url('user-management') }}">
@@ -105,6 +120,31 @@
                     </a>
                 </li>
             @endif
+
+            <li class="nav-item pb-2">
+                <a class="nav-link {{ Request::is('user-profile') ? 'active' : '' }}"
+                    href="{{ url('user-profile') }}">
+                    <div
+                        class="icon icon-shape icon-sm shadow border-radius-md bg-white text-center me-2 d-flex align-items-center justify-content-center">
+                        <i style="font-size: 1rem;"
+                            class="fas fa-lg fa-user ps-2 pe-2 text-center text-dark {{ Request::is('user-profile') ? 'text-white' : 'text-dark' }} "
+                            aria-hidden="true"></i>
+                    </div>
+                    <span class="nav-link-text ms-1">Profile User</span>
+                </a>
+            </li>
+
+            <li class="nav-item pb-2">
+                <a class="nav-link {{ Request::is('logout') ? 'active' : '' }}" href="{{ url('logout') }}">
+                    <div
+                        class="icon icon-shape icon-sm shadow border-radius-md bg-white text-center me-2 d-flex align-items-center justify-content-center">
+                        <i style="font-size: 1rem;"
+                            class="fas fa-lg fa-sign-out-alt ps-2 pe-2 text-center text-danger {{ Request::is('logout') ? 'text-white' : 'text-danger' }} "
+                            aria-hidden="true"></i>
+                    </div>
+                    <span class="nav-link-text text-danger ms-1">Log Out</span>
+                </a>
+            </li>
         </ul>
     </div>
 </aside>

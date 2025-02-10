@@ -23,9 +23,9 @@
                                     </form>
 
                                     <div class="d-flex gap-2">
-                                        <a href="{{ route('room.export') }}" class="btn bg-gradient-success btn-sm">
+                                        <button id="export-selected" class="btn bg-gradient-success btn-sm">
                                             Export Data
-                                        </a>
+                                        </button>
                                         <button class="btn bg-gradient-primary btn-sm" data-bs-toggle="modal"
                                             data-bs-target="#createRoomModal">
                                             Tambah Ruang
@@ -39,36 +39,35 @@
                                 <table class="table table-hover table-striped align-items-center mb-0">
                                     <thead>
                                         <tr>
-                                            <th class="text-uppercase text-secondary text-xxs font-weight-bolder opacity-7">
+                                            <th class="text-center text-secondary text-xxs font-weight-bolder opacity-7">
+                                                <input type="checkbox" id="select-all">
+                                            </th>
+                                            <th class="text-center text-secondary text-xxs font-weight-bolder opacity-7">
                                                 Nama</th>
-                                            <th
-                                                class="text-uppercase text-secondary text-xxs font-weight-bolder opacity-7 ps-2">
+                                            <th class="text-center text-secondary text-xxs font-weight-bolder opacity-7 ps-2">
                                                 Kode</th>
-                                            <th
-                                                class="text-uppercase text-secondary text-xxs font-weight-bolder opacity-7 ps-2">
+                                            <th class="text-center text-secondary text-xxs font-weight-bolder opacity-7 ps-2">
                                                 Informasi</th>
-                                            <th
-                                                class="text-uppercase text-secondary text-xxs font-weight-bolder opacity-7 ps-2">
+                                            <th class="text-center text-secondary text-xxs font-weight-bolder opacity-7 ps-2">
                                                 Aksi</th>
                                         </tr>
                                     </thead>
                                     <tbody>
                                         @forelse ($rooms as $room)
                                             <tr>
-                                                <td>
-                                                    <div class="d-flex px-2 py-1">
-                                                        <div class="d-flex flex-column justify-content-center">
-                                                            <h6 class="mb-0 text-xs">{{ $room->name }}</h6>
-                                                        </div>
-                                                    </div>
+                                                <td class="text-center">
+                                                    <input type="checkbox" class="room-checkbox" value="{{ $room->id }}">
                                                 </td>
-                                                <td>
+                                                <td class="text-center">
+                                                    <p class="text-xs font-weight-bold mb-0">{{ $room->name }}</p>
+                                                </td>
+                                                <td class="text-center">
                                                     <p class="text-xs font-weight-bold mb-0">{{ $room->code }}</p>
                                                 </td>
-                                                <td>
+                                                <td class="text-center">
                                                     <p class="text-xs font-weight-bold mb-0">{{ $room->information }}</p>
                                                 </td>
-                                                <td class="align-middle">
+                                                <td class="text-center">
                                                     <a href="{{ route('room.edit', $room->id) }}"
                                                         class="btn btn-outline-primary p-2">
                                                         <i class="fa fa-pen text-primary fa-lg" data-bs-toggle="tooltip"
@@ -88,7 +87,7 @@
                                             </tr>
                                         @empty
                                             <tr>
-                                                <td colspan="4" class="text-center">No data available</td>
+                                                <td colspan="5" class="text-center">No data available</td>
                                             </tr>
                                         @endforelse
                                     </tbody>
@@ -105,4 +104,35 @@
     </main>
 
     @include('pages.admin.room.create')
+
+    <script>
+        document.addEventListener("DOMContentLoaded", function () {
+            const selectAllCheckbox = document.getElementById("select-all");
+            const checkboxes = document.querySelectorAll(".room-checkbox");
+            const exportButton = document.getElementById("export-selected");
+    
+            selectAllCheckbox.addEventListener("change", function () {
+                checkboxes.forEach(checkbox => {
+                    checkbox.checked = selectAllCheckbox.checked;
+                });
+            });
+    
+            exportButton.addEventListener("click", function () {
+                let selectedIds = [];
+                checkboxes.forEach(checkbox => {
+                    if (checkbox.checked) {
+                        selectedIds.push(checkbox.value);
+                    }
+                });
+    
+                if (selectedIds.length === 0) {
+                    alert("Silakan pilih setidaknya satu data untuk diekspor.");
+                    return;
+                }
+    
+                let exportUrl = "{{ route('room.export') }}" + "?ids=" + selectedIds.join(",");
+                window.location.href = exportUrl;
+            });
+        });
+    </script>
 @endsection

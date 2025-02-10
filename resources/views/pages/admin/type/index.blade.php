@@ -21,9 +21,9 @@
                                         </div>
                                     </form>
                                     <div class="d-flex gap-2">
-                                        <a href="{{ route('type.export') }}" class="btn bg-gradient-success btn-sm">
+                                        <button id="export-selected" class="btn bg-gradient-success btn-sm">
                                             Export Data
-                                        </a>
+                                        </button>
                                         <button class="btn bg-gradient-primary btn-sm" data-bs-toggle="modal"
                                             data-bs-target="#createTypeModal">
                                             Tambah Jenis
@@ -37,32 +37,38 @@
                                 <table class="table table-hover table-striped align-items-center mb-0">
                                     <thead>
                                         <tr>
-                                            <th class="text-uppercase text-secondary text-xxs font-weight-bolder opacity-7">
+                                            <th class="text-center text-secondary text-xxs font-weight-bolder opacity-7">
+                                                <input type="checkbox" id="select-all">
+                                            </th>
+                                            <th class="text-center text-secondary text-xxs font-weight-bolder opacity-7">
                                                 Nama</th>
                                             <th
-                                                class="text-uppercase text-secondary text-xxs font-weight-bolder opacity-7 ps-2">
+                                                class="text-center text-secondary text-xxs font-weight-bolder opacity-7 ps-2">
                                                 Kode</th>
                                             <th
-                                                class="text-uppercase text-secondary text-xxs font-weight-bolder opacity-7 ps-2">
+                                                class="text-center text-secondary text-xxs font-weight-bolder opacity-7 ps-2">
                                                 Informasi</th>
                                             <th
-                                                class="text-uppercase text-secondary text-xxs font-weight-bolder opacity-7 ps-2">
+                                                class="text-center text-secondary text-xxs font-weight-bolder opacity-7 ps-2">
                                                 Aksi</th>
                                         </tr>
                                     </thead>
                                     <tbody>
                                         @forelse ($types as $type)
                                             <tr>
-                                                <td>
+                                                <td class="text-center">
+                                                    <input type="checkbox" class="type-checkbox" value="{{ $type->id }}">
+                                                </td>
+                                                <td class="text-center">
                                                     <p class="text-xs font-weight-bold mb-0">{{ $type->name }}</p>
                                                 </td>
-                                                <td>
+                                                <td class="text-center">
                                                     <p class="text-xs font-weight-bold mb-0">{{ $type->code }}</p>
                                                 </td>
-                                                <td>
+                                                <td class="text-center">
                                                     <p class="text-xs font-weight-bold mb-0">{{ $type->information }}</p>
                                                 </td>
-                                                <td class="align-middle">
+                                                <td class="text-center">
                                                     <a href="{{ route('type.edit', $type->id) }}"
                                                         class="btn btn-outline-primary p-2">
                                                         <i class="fa fa-pen text-primary fa-lg" data-bs-toggle="tooltip"
@@ -98,4 +104,35 @@
         </div>
     </main>
     @include('pages.admin.type.create')
+
+    <script>
+        document.addEventListener("DOMContentLoaded", function () {
+            const selectAllCheckbox = document.getElementById("select-all");
+            const checkboxes = document.querySelectorAll(".type-checkbox");
+            const exportButton = document.getElementById("export-selected");
+    
+            selectAllCheckbox.addEventListener("change", function () {
+                checkboxes.forEach(checkbox => {
+                    checkbox.checked = selectAllCheckbox.checked;
+                });
+            });
+    
+            exportButton.addEventListener("click", function () {
+                let selectedIds = [];
+                checkboxes.forEach(checkbox => {
+                    if (checkbox.checked) {
+                        selectedIds.push(checkbox.value);
+                    }
+                });
+    
+                if (selectedIds.length === 0) {
+                    alert("Silakan pilih setidaknya satu data untuk diekspor.");
+                    return;
+                }
+    
+                let exportUrl = "{{ route('type.export') }}" + "?ids=" + selectedIds.join(",");
+                window.location.href = exportUrl;
+            });
+        });
+    </script>
 @endsection

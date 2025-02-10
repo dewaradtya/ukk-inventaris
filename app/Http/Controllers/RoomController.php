@@ -110,8 +110,17 @@ class RoomController extends Controller
         return redirect()->route('room.index')->with('success', 'Data berhasil dihapus!');
     }
 
-    public function export() 
+    public function export(Request $request)
     {
-        return Excel::download(new RoomExport, 'Ruang Inventaris.xlsx');
+        $roomIds = $request->query('ids');
+
+        if ($roomIds) {
+            $roomIdsArray = explode(',', $roomIds);
+            $rooms = Room::whereIn('id', $roomIdsArray)->get(['name', 'code', 'information']);
+        } else {
+            $rooms = Room::all(['name', 'code', 'information']);
+        }
+
+        return Excel::download(new RoomExport($rooms), 'Ruang Inventaris.xlsx');
     }
 }

@@ -14,7 +14,7 @@ class DashboardController extends Controller
     {
         $user = auth()->user();
 
-        if ($user->level->name === 'User') {
+        if ($user->level->name === 'Peminjam') {
             $employee = Employee::where('id_user', $user->id)->first();
             $borrowings = $employee ? Borrowing::where('id_employee', $employee->id)->get() : collect();
         } else {

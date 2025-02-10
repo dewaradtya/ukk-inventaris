@@ -52,7 +52,7 @@
                     <div class="row">
                         <div class="col-8">
                             <div class="numbers">
-                                <p class="text-sm mb-0 text-capitalize font-weight-bold">Sudah Dikembalikan</p>
+                                <p class="text-sm mb-0 text-capitalize font-weight-bold">Sudah Kembalikan</p>
                                 <h5 class="font-weight-bolder mb-0">
                                     {{ $totalReturned }}
                                 </h5>

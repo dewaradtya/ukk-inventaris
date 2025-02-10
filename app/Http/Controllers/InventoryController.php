@@ -2,11 +2,13 @@
 
 namespace App\Http\Controllers;
 
+use App\Exports\InventoryExport;
 use App\Models\Inventory;
 use App\Models\user;
 use App\Models\Room;
 use App\Models\Type;
 use Illuminate\Http\Request;
+use Maatwebsite\Excel\Facades\Excel;
 
 class InventoryController extends Controller
 {
@@ -147,5 +149,22 @@ class InventoryController extends Controller
         $inventory->delete();
 
         return redirect()->route('inventory.index')->with('success', 'Data berhasil dihapus!');
+    }
+
+    public function export(Request $request)
+    {
+        $inventoryIds = $request->query('ids');
+
+        if ($inventoryIds) {
+            $inventoryIdsArray = explode(',', $inventoryIds);
+            $inventorys = Inventory::with(['type', 'room', 'Peminjam'])
+                ->whereIn('id', $inventoryIdsArray)
+                ->get(['name', 'code', 'condition', 'amount', 'register_date', 'id_type', 'id_room', 'id_user']);
+        } else {
+            $inventorys = Inventory::with(['type', 'room', 'Peminjam'])
+                ->get(['name', 'code', 'condition', 'amount', 'register_date', 'id_type', 'id_room', 'id_user']);
+        }
+
+        return Excel::download(new InventoryExport($inventorys), 'inventory.xlsx');
     }
 }

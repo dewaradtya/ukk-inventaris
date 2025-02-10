@@ -22,13 +22,6 @@
                                             </span>
                                         </div>
                                     </form>
-
-                                    <div class="d-flex gap-2">
-                                        <button class="btn bg-gradient-primary btn-sm mb-0" data-bs-toggle="modal"
-                                            data-bs-target="#createBorrowingModal">
-                                            Tambah Peminjaman
-                                        </button>
-                                    </div>
                                 </div>
                             </div>
                         </div>
@@ -52,16 +45,17 @@
                                             <th class="text-center text-secondary text-xxs font-weight-bolder opacity-7">
                                                 Inventaris Dipinjam
                                             </th>
+                                            @if (Auth::check() && (Auth::user()->level->name === 'Admin' || Auth::user()->level->name === 'Operator'))
+                                                <th
+                                                    class="text-center text-secondary text-xxs font-weight-bolder opacity-7">
+                                                    Aksi
+                                                </th>
+                                            @endif
                                         </tr>
                                     </thead>
                                     <tbody>
                                         @forelse ($borrowings as $borrowing)
-                                            <tr class="borrow-row" data-id="{{ $borrowing->id }}"
-                                                data-edit="{{ route('borrowing.edit', $borrowing->id) }}"
-                                                data-proof="{{ route('borrowing.proof', $borrowing->id) }}"
-                                                data-delete="{{ route('borrowing.destroy', $borrowing->id) }}"
-                                                data-status="{{ route('borrowing.updateStatus', $borrowing->id) }}"
-                                                data-loan-status="{{ $borrowing->loan_status }}">
+                                            <tr>
                                                 <td class="text-center">
                                                     <h6 class="mb-0 text-xs">
                                                         {{ \Carbon\Carbon::parse($borrowing->borrow_date)->translatedFormat('d M Y') }}
@@ -97,16 +91,38 @@
                                                         @endforeach
                                                     </ul>
                                                 </td>
+                                                @if (Auth::check() && (Auth::user()->level->name === 'Admin' || Auth::user()->level->name === 'Operator'))
+                                                    <td class="text-center">
+                                                        <a href="{{ route('borrowing.edit', $borrowing->id) }}"
+                                                            class="btn btn-outline-primary p-2">
+                                                            <i class="fa fa-pen text-primary fa-lg" data-bs-toggle="tooltip"
+                                                                data-bs-placement="top" title="Edit"></i>
+                                                        </a>
+                                                        <form action="{{ route('borrowing.destroy', $borrowing->id) }}"
+                                                            method="POST" class="d-inline">
+                                                            @csrf
+                                                            @method('DELETE')
+                                                            <button type="submit" class="btn btn-outline-danger p-2"
+                                                                onclick="return confirm('Apakah Anda yakin ingin menghapus peminjaman ini?')"
+                                                                data-bs-toggle="tooltip" data-bs-placement="top"
+                                                                title="Hapus">
+                                                                <i class="fa fa-trash fa-lg"></i>
+                                                            </button>
+                                                        </form>
+                                                @endif
+                                                </td>
                                             </tr>
                                         @empty
                                             <tr>
-                                                <td colspan="5" class="text-center">Belum ada data peminjaman</td>
+                                                <td colspan="6" class="text-center">Belum ada data peminjaman
+                                                </td>
                                             </tr>
                                         @endforelse
                                     </tbody>
                                 </table>
                             </div>
 
+                            {{-- Pagination --}}
                             <div class="d-flex justify-content-center mt-3">
                                 {{ $borrowings->withQueryString()->links() }}
                             </div>
@@ -117,6 +133,4 @@
         </div>
     </main>
 
-    @include('pages.admin.borrowing.create')
-    @include('pages.admin.borrowing.modal')
 @endsection

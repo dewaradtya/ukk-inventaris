@@ -26,7 +26,7 @@ class EmployeeController extends Controller
         if (auth()->user()->level->name === 'Admin') {
             $users = User::doesntHave('employee')
                 ->whereHas('level', function ($query) {
-                    $query->where('name', 'User');
+                    $query->where('name', 'Peminjam');
                 })
                 ->get();
         }
@@ -55,7 +55,7 @@ class EmployeeController extends Controller
 
         $userRole = auth()->user()->level->name;
 
-        if ($userRole === 'User') {
+        if ($userRole === 'Peminjam') {
             $user = auth()->user();
             $employee = Employee::create([
                 'name' => $request->name,
@@ -100,7 +100,7 @@ class EmployeeController extends Controller
                 $query->where('id', $employee->id);
             })
             ->whereHas('level', function ($query) {
-                $query->where('name', 'User');
+                $query->where('name', 'Peminjam');
             })
             ->get();
 
@@ -131,7 +131,7 @@ class EmployeeController extends Controller
 
         $userRole = auth()->user()->level->name;
 
-        if ($userRole === 'User') {
+        if ($userRole === 'Peminjam') {
             $user = auth()->user();
             $employee->update(['id_user' => $user->id]);
         } elseif ($userRole === 'Admin') {

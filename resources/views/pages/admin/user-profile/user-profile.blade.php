@@ -11,7 +11,7 @@
             <div class="row gx-4">
                 <div class="col-auto">
                     <div class="avatar avatar-xl position-relative">
-                        <img src="{{ auth()->user()->image ? asset('storage/' . auth()->user()->image) : asset('assets/img/default-avatar.jpg') }}" alt="..." class="w-100 h-100 border-radius-lg shadow-sm">
+                        <img src="{{ auth()->user()->image ? asset('storage/' . auth()->user()->image) : asset('assets/img/default-avatar.jpg') }}" alt="..." class="w-100 h-100 border-radius-lg shadow-sm rounded-circle">
                         <a href="#" class="btn btn-sm btn-icon-only bg-gradient-light position-absolute bottom-0 end-0 mb-n2 me-n2" data-bs-toggle="modal" data-bs-target="#uploadImageModal">
                             <i class="fa fa-pen top-0" data-bs-toggle="tooltip" data-bs-placement="top" title="Edit Image"></i>
                         </a>                        
@@ -105,17 +105,17 @@
 
 <!-- Modal Upload Gambar -->
 <div class="modal fade" id="uploadImageModal" tabindex="-1" aria-labelledby="uploadImageModalLabel" aria-hidden="true">
-    <div class="modal-dialog">
+    <div class="modal-dialog modal-md modal-dialog-centered">
         <div class="modal-content">
-            <div class="modal-header">
-                <h5 class="modal-title" id="uploadImageModalLabel">Edit Profile Image</h5>
+            <div class="modal-header bg-primary">
+                <h5 class="modal-title text-white" id="uploadImageModalLabel">Edit Profile Image</h5>
                 <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
             </div>
             <div class="modal-body">
                 <form action="{{ route('profile.update.image') }}" method="POST" enctype="multipart/form-data">
                     @csrf
                     <div class="mb-3">
-                        <label for="profile-image" class="form-label">Choose an image</label>
+                        <label for="profile-image" class="form-label">Pilih Gambar</label>
                         <input type="file" class="form-control" id="profile-image" name="image" accept="image/*" required>
                     </div>
                     <div class="d-flex justify-content-end">
