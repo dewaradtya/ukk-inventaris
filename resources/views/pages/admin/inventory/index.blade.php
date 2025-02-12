@@ -5,11 +5,12 @@
         <div class="container-fluid py-4">
             <div class="row">
                 <div class="col-12">
-                    <div class="card mb-4">
-                        <div class="card-header pb-0">
+                    <div class="card shadow-sm">
+                        <div class="card-header bg-white">
                             <div class="d-flex flex-column flex-md-row justify-content-between align-items-md-center gap-3">
                                 <div>
-                                    <h6 class="mb-0">Tabel Inventaris</h6>
+                                    <h5 class="mb-0">Manajemen Inventaris</h5>
+                                    <p class="text-muted small mb-0">Kelola data inventaris</p>
                                 </div>
                                 <div class="d-flex flex-column flex-sm-row gap-2 w-100 w-md-auto">
                                     <form action="{{ route('inventory.index') }}" method="GET" class="w-100 w-sm-auto">
@@ -34,7 +35,54 @@
                             </div>
                         </div>
                         <div class="card-body px-0 pt-0 pb-2">
-                            <div class="table-responsive p-0">
+                            <div class="px-4 mt-2">
+                                <form action="{{ route('inventory.index') }}" method="GET">
+                                    <div class="row g-2">
+                                        <div class="col-md-3">
+                                            <select class="form-select" name="condition">
+                                                <option value="">Semua Kondisi</option>
+                                                <option value="baik"
+                                                    {{ request('condition') == 'baik' ? 'selected' : '' }}>Baik</option>
+                                                <option value="rusak"
+                                                    {{ request('condition') == 'rusak' ? 'selected' : '' }}>Rusak</option>
+                                                <option value="hilang"
+                                                    {{ request('condition') == 'hilang' ? 'selected' : '' }}>Hilang</option>
+                                            </select>
+                                        </div>
+                                        <div class="col-md-3">
+                                            <select class="form-select" name="type">
+                                                <option value="">Semua Jenis</option>
+                                                @foreach ($types ?? [] as $type)
+                                                    <option value="{{ $type->id }}"
+                                                        {{ request('type') == $type->id ? 'selected' : '' }}>
+                                                        {{ $type->name }}
+                                                    </option>
+                                                @endforeach
+                                            </select>
+                                        </div>
+                                        <div class="col-md-3">
+                                            <select class="form-select" name="room">
+                                                <option value="">Semua Ruangan</option>
+                                                @foreach ($rooms ?? [] as $room)
+                                                    <option value="{{ $room->id }}"
+                                                        {{ request('room') == $room->id ? 'selected' : '' }}>
+                                                        {{ $room->name }}
+                                                    </option>
+                                                @endforeach
+                                            </select>
+                                        </div>
+                                        <div class="col-md-3 d-flex gap-2">
+                                            <button type="submit" class="btn btn-secondary w-100">
+                                                <i class="fas fa-filter me-1"></i> Terap
+                                            </button>
+                                            <a href="{{ route('inventory.index') }}" class="btn btn-light w-100">
+                                                <i class="fas fa-times me-1"></i> Reset
+                                            </a>
+                                        </div>
+                                    </div>
+                                </form>
+                            </div>
+                            <div class="table-responsive px-4">
                                 <table class="table table-hover table-striped align-items-center mb-0">
                                     <thead>
                                         <tr>
@@ -76,16 +124,22 @@
                                                     <input type="checkbox" class="inventory-checkbox"
                                                         value="{{ $inventory->id }}">
                                                 </td>
-                                                <td class="text-center text-xs font-weight-bold mb-0">{{ $inventory->name }}
-                                                </td>
                                                 <td class="text-center text-xs font-weight-bold mb-0">
-                                                    {{ $inventory->condition }}</td>
+                                                    {{ $inventory->name }}
+                                                </td>
+                                                <td class="text-center">
+                                                    <span
+                                                        class="badge bg-{{ $inventory->condition === 'baik' ? 'success' : ($inventory->condition === 'rusak' ? 'warning' : 'danger') }}">
+                                                        {{ $inventory->condition }}
+                                                    </span>
+                                                </td>
                                                 <td class="text-center text-xs font-weight-bold mb-0">
                                                     {{ $inventory->amount }}</td>
                                                 <td class="text-center text-xs font-weight-bold mb-0">
                                                     {{ $inventory->register_date }}
                                                 </td>
-                                                <td class="text-center text-xs font-weight-bold mb-0">{{ $inventory->code }}
+                                                <td class="text-center">
+                                                    <span class="badge bg-dark font-weight-bold text-light">{{ $inventory->code }}</span>
                                                 </td>
                                                 <td class="text-center text-xs font-weight-bold mb-0">
                                                     {{ $inventory->type->name ?? 'N/A' }}</td>

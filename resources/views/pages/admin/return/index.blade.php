@@ -5,11 +5,12 @@
         <div class="container-fluid py-4">
             <div class="row">
                 <div class="col-12">
-                    <div class="card mb-4">
-                        <div class="card-header pb-0">
+                    <div class="card shadow-sm">
+                        <div class="card-header bg-white">
                             <div class="d-flex flex-column flex-md-row justify-content-between align-items-md-center gap-3">
                                 <div>
-                                    <h6 class="mb-0">Tabel Peminjaman</h6>
+                                    <h5 class="mb-0">Manajemen Pengembalian</h5>
+                                    <p class="text-muted small mb-0">Kelola data pengembalian</p>
                                 </div>
 
                                 <div class="d-flex flex-column flex-sm-row gap-2 w-100 w-md-auto">
@@ -26,7 +27,7 @@
                             </div>
                         </div>
                         <div class="card-body px-0 pt-0 pb-2">
-                            <div class="table-responsive p-0">
+                            <div class="table-responsive px-4">
                                 <table class="table table-hover table-striped align-items-center mb-0">
                                     <thead>
                                         <tr>
@@ -37,6 +38,9 @@
                                                 Tanggal Pengembalian
                                             </th>
                                             <th class="text-center text-secondary text-xxs font-weight-bolder opacity-7">
+                                                Tanggal Dikembalikan
+                                            </th>
+                                            <th class="text-center text-secondary text-xxs font-weight-bolder opacity-7">
                                                 Status Peminjaman
                                             </th>
                                             <th class="text-center text-secondary text-xxs font-weight-bolder opacity-7">
@@ -45,45 +49,48 @@
                                             <th class="text-center text-secondary text-xxs font-weight-bolder opacity-7">
                                                 Inventaris Dipinjam
                                             </th>
-                                            @if (Auth::check() && (Auth::user()->level->name === 'Admin' || Auth::user()->level->name === 'Operator'))
-                                                <th
-                                                    class="text-center text-secondary text-xxs font-weight-bolder opacity-7">
-                                                    Aksi
-                                                </th>
-                                            @endif
+                                            <th class="text-center text-secondary text-xxs font-weight-bolder opacity-7">
+                                                Aksi
+                                            </th>
                                         </tr>
                                     </thead>
                                     <tbody>
-                                        @forelse ($borrowings as $borrowing)
+                                        @forelse ($returns as $return)
                                             <tr>
                                                 <td class="text-center">
                                                     <h6 class="mb-0 text-xs">
-                                                        {{ \Carbon\Carbon::parse($borrowing->borrow_date)->translatedFormat('d M Y') }}
+                                                        {{ \Carbon\Carbon::parse($return->borrow_date)->translatedFormat('d M Y') }}
                                                     </h6>
                                                 </td>
 
                                                 <td class="text-center">
                                                     <p class="text-xs font-weight-bold mb-0">
-                                                        {{ $borrowing->return_date ? \Carbon\Carbon::parse($borrowing->return_date)->translatedFormat('d M Y') : '-' }}
+                                                        {{ $return->return_date ? \Carbon\Carbon::parse($return->return_date)->translatedFormat('d M Y') : '-' }}
+                                                    </p>
+                                                </td>
+
+                                                <td class="text-center">
+                                                    <p class="text-xs font-weight-bold mb-0">
+                                                        {{ $return->actual_return_date ? \Carbon\Carbon::parse($return->actual_return_date)->translatedFormat('d M Y') : '-' }}
                                                     </p>
                                                 </td>
 
                                                 <td class="text-center">
                                                     <span
-                                                        class="badge {{ $borrowing->loan_status === 'borrow' ? 'bg-warning' : 'bg-success' }}">
-                                                        {{ $borrowing->loan_status === 'borrow' ? 'Dipinjam' : 'Dikembalikan' }}
+                                                        class="badge {{ $return->loan_status === 'borrow' ? 'bg-warning' : 'bg-success' }}">
+                                                        {{ $return->loan_status === 'borrow' ? 'Dipinjam' : 'Dikembalikan' }}
                                                     </span>
                                                 </td>
 
                                                 <td class="text-center">
                                                     <p class="text-xs mb-0">
-                                                        {{ $borrowing->employee->name ?? 'Tidak Diketahui' }}
+                                                        {{ $return->employee->name ?? 'Tidak Diketahui' }}
                                                     </p>
                                                 </td>
 
                                                 <td class="text-center">
                                                     <ul class="text-xs mb-0">
-                                                        @foreach ($borrowing->loanDetails as $loanDetail)
+                                                        @foreach ($return->loanDetails as $loanDetail)
                                                             <li>
                                                                 {{ $loanDetail->inventory->name ?? 'Inventaris Tidak Ditemukan' }}
                                                                 ({{ $loanDetail->amount }})
@@ -91,30 +98,23 @@
                                                         @endforeach
                                                     </ul>
                                                 </td>
-                                                @if (Auth::check() && (Auth::user()->level->name === 'Admin' || Auth::user()->level->name === 'Operator'))
-                                                    <td class="text-center">
-                                                        <a href="{{ route('borrowing.edit', $borrowing->id) }}"
-                                                            class="btn btn-outline-primary p-2">
-                                                            <i class="fa fa-pen text-primary fa-lg" data-bs-toggle="tooltip"
-                                                                data-bs-placement="top" title="Edit"></i>
+                                                <td class="text-center">
+                                                    <p class="text-xs mb-0">
+                                                        <a href="#" class="open-action-modal text-danger"
+                                                            data-id="{{ $return->id }}" data-bs-toggle="tooltip"
+                                                            data-bs-placement="top" title="Klik untuk melakukan aksi"
+                                                            data-edit="{{ route('borrowing.edit', $return->id) }}"
+                                                            data-proof="{{ route('return.proof', $return->id) }}"
+                                                            data-delete="{{ route('borrowing.destroy', $return->id) }}"
+                                                            data-loan-status="{{ $return->loan_status }}">
+                                                            <i class="fas fa-ellipsis fa-2x"></i>
                                                         </a>
-                                                        <form action="{{ route('borrowing.destroy', $borrowing->id) }}"
-                                                            method="POST" class="d-inline">
-                                                            @csrf
-                                                            @method('DELETE')
-                                                            <button type="submit" class="btn btn-outline-danger p-2"
-                                                                onclick="return confirm('Apakah Anda yakin ingin menghapus peminjaman ini?')"
-                                                                data-bs-toggle="tooltip" data-bs-placement="top"
-                                                                title="Hapus">
-                                                                <i class="fa fa-trash fa-lg"></i>
-                                                            </button>
-                                                        </form>
-                                                @endif
+                                                    </p>
                                                 </td>
                                             </tr>
                                         @empty
                                             <tr>
-                                                <td colspan="6" class="text-center">Belum ada data peminjaman
+                                                <td colspan="7" class="text-center">Belum ada data pengembalian
                                                 </td>
                                             </tr>
                                         @endforelse
@@ -124,7 +124,7 @@
 
                             {{-- Pagination --}}
                             <div class="d-flex justify-content-center mt-3">
-                                {{ $borrowings->withQueryString()->links() }}
+                                {{ $returns->withQueryString()->links() }}
                             </div>
                         </div>
                     </div>
@@ -132,5 +132,7 @@
             </div>
         </div>
     </main>
+
+    @include('pages.admin.return.modal')
 
 @endsection

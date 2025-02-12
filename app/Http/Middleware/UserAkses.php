@@ -13,18 +13,19 @@ class UserAkses
      *
      * @param  \Illuminate\Http\Request  $request
      * @param  \Closure  $next
-     * @param  string  $level
+     * @param  mixed
      * @return mixed
      */
-    public function handle(Request $request, Closure $next, $level)
+    public function handle(Request $request, Closure $next, ...$levels)
     {
         if (!Auth::check()) {
             return redirect('/login')->with('error', 'Anda harus login terlebih dahulu.');
         }
 
         $user = Auth::user();
-        if ($user->level->name !== $level) {
-            return redirect('/')->with('error', 'Anda tidak memiliki akses ke halaman ini.');
+
+        if (!in_array($user->level->name, $levels)) {
+            return redirect()->back()->with('error', 'Anda tidak memiliki akses ke halaman ini.');
         }
 
         return $next($request);

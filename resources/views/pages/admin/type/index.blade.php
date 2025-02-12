@@ -5,11 +5,12 @@
         <div class="container-fluid py-4">
             <div class="row">
                 <div class="col-12">
-                    <div class="card mb-4">
-                        <div class="card-header pb-0">
+                    <div class="card shadow-sm">
+                        <div class="card-header bg-white">
                             <div class="d-flex flex-column flex-md-row justify-content-between align-items-md-center gap-3">
                                 <div>
-                                    <h6 class="mb-0">Tabel Jenis Inventaris</h6>
+                                    <h5 class="mb-0">Manajemen Jenis Inventaris</h5>
+                                    <p class="text-muted small mb-0">Kelola data jenis inventaris</p>
                                 </div>
                                 <div class="d-flex flex-column flex-sm-row gap-2 w-100 w-md-auto">
                                     <form action="{{ route('type.index') }}" method="GET" class="w-100 w-sm-auto">
@@ -33,7 +34,7 @@
                             </div>
                         </div>
                         <div class="card-body px-0 pt-0 pb-2">
-                            <div class="table-responsive p-0">
+                            <div class="table-responsive px-4">
                                 <table class="table table-hover table-striped align-items-center mb-0">
                                     <thead>
                                         <tr>
@@ -57,13 +58,14 @@
                                         @forelse ($types as $type)
                                             <tr>
                                                 <td class="text-center">
-                                                    <input type="checkbox" class="type-checkbox" value="{{ $type->id }}">
+                                                    <input type="checkbox" class="type-checkbox"
+                                                        value="{{ $type->id }}">
                                                 </td>
                                                 <td class="text-center">
                                                     <p class="text-xs font-weight-bold mb-0">{{ $type->name }}</p>
                                                 </td>
                                                 <td class="text-center">
-                                                    <p class="text-xs font-weight-bold mb-0">{{ $type->code }}</p>
+                                                    <span class="badge bg-dark font-weight-bold text-light">{{ $type->code }}</span>
                                                 </td>
                                                 <td class="text-center">
                                                     <p class="text-xs font-weight-bold mb-0">{{ $type->information }}</p>
@@ -106,30 +108,30 @@
     @include('pages.admin.type.create')
 
     <script>
-        document.addEventListener("DOMContentLoaded", function () {
+        document.addEventListener("DOMContentLoaded", function() {
             const selectAllCheckbox = document.getElementById("select-all");
             const checkboxes = document.querySelectorAll(".type-checkbox");
             const exportButton = document.getElementById("export-selected");
-    
-            selectAllCheckbox.addEventListener("change", function () {
+
+            selectAllCheckbox.addEventListener("change", function() {
                 checkboxes.forEach(checkbox => {
                     checkbox.checked = selectAllCheckbox.checked;
                 });
             });
-    
-            exportButton.addEventListener("click", function () {
+
+            exportButton.addEventListener("click", function() {
                 let selectedIds = [];
                 checkboxes.forEach(checkbox => {
                     if (checkbox.checked) {
                         selectedIds.push(checkbox.value);
                     }
                 });
-    
+
                 if (selectedIds.length === 0) {
                     alert("Silakan pilih setidaknya satu data untuk diekspor.");
                     return;
                 }
-    
+
                 let exportUrl = "{{ route('type.export') }}" + "?ids=" + selectedIds.join(",");
                 window.location.href = exportUrl;
             });

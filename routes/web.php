@@ -4,6 +4,7 @@ use App\Http\Controllers\BorrowingController;
 use App\Http\Controllers\ChangePasswordController;
 use App\Http\Controllers\DashboardController;
 use App\Http\Controllers\EmployeeController;
+use App\Http\Controllers\FineController;
 use App\Http\Controllers\HomeController;
 use App\Http\Controllers\InfoUserController;
 use App\Http\Controllers\InventoryController;
@@ -25,8 +26,6 @@ Route::get('home', function () {
 })->name('home');
 
 Route::group(['middleware' => 'auth'], function () {
-
-
 	Route::resource('dashboard', DashboardController::class);
 
 	Route::middleware(['userakses:Admin'])->group(function () {
@@ -38,16 +37,23 @@ Route::group(['middleware' => 'auth'], function () {
 		Route::resource('/inventory', InventoryController::class);
 		Route::get('/inventory-export', [InventoryController::class, 'export'])->name('inventory.export');
 		Route::resource('/user-management', UserManagementController::class);
+		Route::get('/borrowing/export', [BorrowingController::class, 'export'])->name('borrowing.export');
+	});
+	Route::middleware(['auth', 'userakses:Admin,Operator'])->group(function () {
+		Route::put('/borrowing/{id}/update-status', [BorrowingController::class, 'updateStatus'])
+			->name('borrowing.updateStatus');
 	});
 	Route::resource('/employee', EmployeeController::class);
 	Route::resource('/borrowing', BorrowingController::class);
 	Route::get('/borrowing/{id}/proof', [BorrowingController::class, 'proof'])->name('borrowing.proof');
-	Route::put('/borrowing/{id}/update-status', [BorrowingController::class, 'updateStatus'])->name('borrowing.updateStatus');
 	Route::resource('/return', ReturnController::class);
+	Route::get('/return/{id}/proof', [ReturnController::class, 'proof'])->name('return.proof');
 	Route::get('/logout', [SessionsController::class, 'destroy']);
 	Route::get('/user-profile', [InfoUserController::class, 'create'])->name('userProfile.create');
 	Route::post('/user-profile', [InfoUserController::class, 'store']);
 	Route::post('/user-profile/update-image', [InfoUserController::class, 'updateImage'])->name('profile.update.image');
+	Route::resource('/fine', FineController::class);
+	Route::post('/fine/{id}/pay', [FineController::class, 'payFine'])->name('fine.pay');
 	Route::get('/login', function () {
 		return view('dashboard');
 	})->name('sign-up');

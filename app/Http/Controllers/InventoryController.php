@@ -19,7 +19,7 @@ class InventoryController extends Controller
     {
         $query = Inventory::with(['type', 'room', 'user']);
 
-        if ($request->has('search')) {
+        if ($request->has('search') && $request->search !== '') {
             $search = $request->search;
             $query->where(function ($q) use ($search) {
                 $q->where('name', 'like', "%{$search}%")
@@ -36,7 +36,19 @@ class InventoryController extends Controller
             });
         }
 
-        $inventories = $query->paginate(10);
+        if ($request->filled('condition')) {
+            $query->where('condition', $request->condition);
+        }
+
+        if ($request->filled('type')) {
+            $query->where('id_type', $request->type);
+        }
+
+        if ($request->filled('room')) {
+            $query->where('id_room', $request->room);
+        }
+
+        $inventories = $query->paginate(10)->appends($request->query());
         $types = Type::all();
         $rooms = Room::all();
         $users = User::all();
@@ -157,11 +169,11 @@ class InventoryController extends Controller
 
         if ($inventoryIds) {
             $inventoryIdsArray = explode(',', $inventoryIds);
-            $inventorys = Inventory::with(['type', 'room', 'Peminjam'])
+            $inventorys = Inventory::with(['type', 'room', 'user'])
                 ->whereIn('id', $inventoryIdsArray)
                 ->get(['name', 'code', 'condition', 'amount', 'register_date', 'id_type', 'id_room', 'id_user']);
         } else {
-            $inventorys = Inventory::with(['type', 'room', 'Peminjam'])
+            $inventorys = Inventory::with(['type', 'room', 'user'])
                 ->get(['name', 'code', 'condition', 'amount', 'register_date', 'id_type', 'id_room', 'id_user']);
         }
 

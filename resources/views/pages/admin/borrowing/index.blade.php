@@ -5,15 +5,16 @@
         <div class="container-fluid py-4">
             <div class="row">
                 <div class="col-12">
-                    <div class="card mb-4">
-                        <div class="card-header pb-0">
+                    <div class="card shadow-sm">
+                        <div class="card-header bg-white">
                             <div class="d-flex flex-column flex-md-row justify-content-between align-items-md-center gap-3">
                                 <div>
-                                    <h6 class="mb-0">Tabel Peminjaman</h6>
+                                    <h5 class="mb-0">Manajemen Peminjaman</h5>
+                                    <p class="text-muted small mb-0">Kelola data peminjaman</p>
                                 </div>
 
                                 <div class="d-flex flex-column flex-sm-row gap-2 w-100 w-md-auto">
-                                    <form action="{{ route('room.index') }}" method="GET" class="w-100 w-sm-auto">
+                                    <form action="{{ route('borrowing.index') }}" method="GET" class="w-100 w-sm-auto">
                                         <div class="input-group input-group-sm">
                                             <input type="text" name="search" class="form-control form-control-sm"
                                                 placeholder="Cari nama atau kode..." value="{{ request('search') }}">
@@ -24,7 +25,12 @@
                                     </form>
 
                                     <div class="d-flex gap-2">
-                                        <button class="btn bg-gradient-primary btn-sm mb-0" data-bs-toggle="modal"
+                                        @if (Auth::check() && Auth::user()->level->name === 'Admin')
+                                            <button id="export-selected" class="btn bg-gradient-success btn-sm">
+                                                Export Data
+                                            </button>
+                                        @endif
+                                        <button class="btn bg-gradient-primary btn-sm" data-bs-toggle="modal"
                                             data-bs-target="#createBorrowingModal">
                                             Tambah Peminjaman
                                         </button>
@@ -33,10 +39,13 @@
                             </div>
                         </div>
                         <div class="card-body px-0 pt-0 pb-2">
-                            <div class="table-responsive p-0">
+                            <div class="table-responsive px-4">
                                 <table class="table table-hover table-striped align-items-center mb-0">
                                     <thead>
                                         <tr>
+                                            <th class="text-center text-secondary text-xxs font-weight-bolder opacity-7">
+                                                <input type="checkbox" id="select-all">
+                                            </th>
                                             <th class="text-center text-secondary text-xxs font-weight-bolder opacity-7">
                                                 Tanggal Peminjaman
                                             </th>
@@ -52,16 +61,18 @@
                                             <th class="text-center text-secondary text-xxs font-weight-bolder opacity-7">
                                                 Inventaris Dipinjam
                                             </th>
+                                            <th class="text-center text-secondary text-xxs font-weight-bolder opacity-7">
+                                                Aksi
+                                            </th>
                                         </tr>
                                     </thead>
                                     <tbody>
                                         @forelse ($borrowings as $borrowing)
-                                            <tr class="borrow-row" data-id="{{ $borrowing->id }}"
-                                                data-edit="{{ route('borrowing.edit', $borrowing->id) }}"
-                                                data-proof="{{ route('borrowing.proof', $borrowing->id) }}"
-                                                data-delete="{{ route('borrowing.destroy', $borrowing->id) }}"
-                                                data-status="{{ route('borrowing.updateStatus', $borrowing->id) }}"
-                                                data-loan-status="{{ $borrowing->loan_status }}">
+                                            <tr>
+                                                <td class="text-center">
+                                                    <input type="checkbox" class="borrowing-checkbox"
+                                                        value="{{ $borrowing->id }}">
+                                                </td>
                                                 <td class="text-center">
                                                     <h6 class="mb-0 text-xs">
                                                         {{ \Carbon\Carbon::parse($borrowing->borrow_date)->translatedFormat('d M Y') }}
@@ -84,6 +95,7 @@
                                                 <td class="text-center">
                                                     <p class="text-xs mb-0">
                                                         {{ $borrowing->employee->name ?? 'Tidak Diketahui' }}
+                                                        </a>
                                                     </p>
                                                 </td>
 
@@ -97,10 +109,25 @@
                                                         @endforeach
                                                     </ul>
                                                 </td>
+
+                                                <td class="text-center">
+                                                    <p class="text-xs mb-0">
+                                                        <a href="#" class="open-action-modal text-danger"
+                                                            data-id="{{ $borrowing->id }}" data-bs-toggle="tooltip"
+                                                            data-bs-placement="top" title="Klik untuk melakukan aksi"
+                                                            data-edit="{{ route('borrowing.edit', $borrowing->id) }}"
+                                                            data-proof="{{ route('borrowing.proof', $borrowing->id) }}"
+                                                            data-delete="{{ route('borrowing.destroy', $borrowing->id) }}"
+                                                            data-status="{{ route('borrowing.updateStatus', $borrowing->id) }}"
+                                                            data-loan-status="{{ $borrowing->loan_status }}">
+                                                            <i class="fas fa-ellipsis fa-2x"></i>
+                                                        </a>
+                                                    </p>
+                                                </td>
                                             </tr>
                                         @empty
                                             <tr>
-                                                <td colspan="5" class="text-center">Belum ada data peminjaman</td>
+                                                <td colspan="7" class="text-center">Belum ada data peminjaman</td>
                                             </tr>
                                         @endforelse
                                     </tbody>
@@ -119,4 +146,35 @@
 
     @include('pages.admin.borrowing.create')
     @include('pages.admin.borrowing.modal')
+
+    <script>
+        document.addEventListener("DOMContentLoaded", function() {
+            const selectAllCheckbox = document.getElementById("select-all");
+            const checkboxes = document.querySelectorAll(".borrowing-checkbox");
+            const exportButton = document.getElementById("export-selected");
+
+            selectAllCheckbox.addEventListener("change", function() {
+                checkboxes.forEach(checkbox => {
+                    checkbox.checked = selectAllCheckbox.checked;
+                });
+            });
+
+            exportButton.addEventListener("click", function() {
+                let selectedIds = [];
+                checkboxes.forEach(checkbox => {
+                    if (checkbox.checked) {
+                        selectedIds.push(checkbox.value);
+                    }
+                });
+
+                if (selectedIds.length === 0) {
+                    alert("Silakan pilih setidaknya satu data untuk diekspor.");
+                    return;
+                }
+
+                let exportUrl = "{{ route('borrowing.export') }}" + "?ids=" + selectedIds.join(",");
+                window.location.href = exportUrl;
+            });
+        });
+    </script>
 @endsection

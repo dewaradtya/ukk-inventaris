@@ -5,6 +5,7 @@ namespace App\Http\Controllers;
 use App\Models\Borrowing;
 use App\Models\Employee;
 use App\Models\Inventory;
+use Barryvdh\DomPDF\Facade\Pdf;
 use Illuminate\Http\Request;
 
 class ReturnController extends Controller
@@ -19,20 +20,20 @@ class ReturnController extends Controller
         if ($user->level->name === 'Peminjam') {
             $employee = Employee::where('id_user', $user->id)->first();
 
-            $borrowings = $employee
+            $returns = $employee
                 ? Borrowing::where('id_employee', $employee->id)
                 ->where('loan_status', 'return')
                 ->with('employee')
                 ->paginate(10)
                 : Borrowing::where('id', null)->paginate(10);
         } else {
-            $borrowings = Borrowing::where('loan_status', 'return')
+            $returns = Borrowing::where('loan_status', 'return')
                 ->with('employee')
                 ->paginate(10);
         }
 
         return view('pages.admin.return.index', [
-            'borrowings'  => $borrowings,
+            'returns'  => $returns,
             'employees'   => Employee::all(),
             'inventories' => Inventory::all(),
         ]);
@@ -84,5 +85,14 @@ class ReturnController extends Controller
     public function destroy(string $id)
     {
         //
+    }
+
+    public function proof(string $id)
+    {
+        $borrowing = Borrowing::with('employee', 'loanDetails.inventory')->findOrFail($id);
+
+        $pdf = Pdf::loadView('pages.admin.return.proof', compact('borrowing'));
+
+        return $pdf->stream('bukti_pengembalian.pdf');
     }
 }

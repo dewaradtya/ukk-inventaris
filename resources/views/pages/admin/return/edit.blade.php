@@ -7,7 +7,7 @@
                 <div class="col-12">
                     <div class="card">
                         <div class="card-header pb-0">
-                            <h6>Edit Peminjaman</h6>
+                            <h6>Edit Pengembalian</h6>
                         </div>
                         <div class="card-body">
                             <form action="{{ route('borrowing.update', $borrowing->id) }}" method="POST">

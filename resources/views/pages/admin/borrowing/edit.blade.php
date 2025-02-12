@@ -27,20 +27,20 @@
                                         </div>
                                     </div>
 
-                                    <div class="col-md-6">
-                                        <div class="form-floating mb-3">
-                                            <input type="date"
-                                                class="form-control @error('return_date') is-invalid @enderror"
-                                                id="return_date" name="return_date"
-                                                value="{{ old('return_date', $borrowing->return_date) }}">
-                                            <label for="return_date" class="form-label">Tanggal Pengembalian</label>
-                                            @error('return_date')
-                                                <div class="invalid-feedback">{{ $message }}</div>
-                                            @enderror
-                                        </div>
-                                    </div>
-
                                     @if (auth()->user()->level->name !== 'Peminjam')
+                                        <div class="col-md-6">
+                                            <div class="form-floating mb-3">
+                                                <input type="date"
+                                                    class="form-control @error('return_date') is-invalid @enderror"
+                                                    id="return_date" name="return_date"
+                                                    value="{{ old('return_date', $borrowing->return_date) }}">
+                                                <label for="return_date" class="form-label">Tanggal Pengembalian</label>
+                                                @error('return_date')
+                                                    <div class="invalid-feedback">{{ $message }}</div>
+                                                @enderror
+                                            </div>
+                                        </div>
+
                                         <div class="mb-3">
                                             <label for="id_employee" class="form-label">Pegawai</label>
                                             <select class="form-control @error('id_employee') is-invalid @enderror"

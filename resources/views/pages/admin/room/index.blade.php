@@ -5,11 +5,12 @@
         <div class="container-fluid py-4">
             <div class="row">
                 <div class="col-12">
-                    <div class="card mb-4">
-                        <div class="card-header pb-0">
+                    <div class="card shadow-sm">
+                        <div class="card-header bg-white">
                             <div class="d-flex flex-column flex-md-row justify-content-between align-items-md-center gap-3">
                                 <div>
-                                    <h6 class="mb-0">Tabel Ruang Inventaris</h6>
+                                    <h5 class="mb-0">Manajemen Ruangan Inventaris</h5>
+                                    <p class="text-muted small mb-0">Kelola data ruangan inventaris</p>
                                 </div>
                                 <div class="d-flex flex-column flex-sm-row gap-2 w-100 w-md-auto">
                                     <form action="{{ route('room.index') }}" method="GET" class="w-100 w-sm-auto">
@@ -35,7 +36,7 @@
                             </div>
                         </div>
                         <div class="card-body px-0 pt-0 pb-2">
-                            <div class="table-responsive p-0">
+                            <div class="table-responsive px-4">
                                 <table class="table table-hover table-striped align-items-center mb-0">
                                     <thead>
                                         <tr>
@@ -62,7 +63,7 @@
                                                     <p class="text-xs font-weight-bold mb-0">{{ $room->name }}</p>
                                                 </td>
                                                 <td class="text-center">
-                                                    <p class="text-xs font-weight-bold mb-0">{{ $room->code }}</p>
+                                                    <span class="badge bg-dark font-weight-bold text-light">{{ $room->code }}</span>
                                                 </td>
                                                 <td class="text-center">
                                                     <p class="text-xs font-weight-bold mb-0">{{ $room->information }}</p>

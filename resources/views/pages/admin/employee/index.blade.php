@@ -6,12 +6,12 @@
             @if (in_array(auth()->user()->level->name, ['Admin', 'Operator']))
                 <div class="row">
                     <div class="col-12">
-                        <div class="card mb-4">
-                            <div class="card-header pb-0">
-                                <div
-                                    class="d-flex flex-column flex-md-row justify-content-between align-items-md-center gap-3">
+                        <div class="card shadow-sm">
+                            <div class="card-header bg-white">
+                                <div class="d-flex flex-column flex-md-row justify-content-between align-items-md-center gap-3">
                                     <div>
-                                        <h6 class="mb-0">Tabel Pegawai</h6>
+                                        <h5 class="mb-0">Manajemen Pegawai</h5>
+                                        <p class="text-muted small mb-0">Kelola data pegawai</p>
                                     </div>
                                     <div class="d-flex flex-column flex-sm-row gap-2 w-100 w-md-auto">
                                         <form action="{{ route('employee.index') }}" method="GET" class="w-100 w-sm-auto">
@@ -33,7 +33,7 @@
                                 </div>
                             </div>
                             <div class="card-body px-0 pt-0 pb-2">
-                                <div class="table-responsive p-0">
+                                <div class="table-responsive px-4">
                                     <table class="table table-hover table-striped align-items-center mb-0">
                                         <thead>
                                             <tr>
@@ -58,7 +58,7 @@
                                                         <p class="text-xs font-weight-bold mb-0">{{ $employee->name }}</p>
                                                     </td>
                                                     <td class="text-center">
-                                                        <p class="text-xs font-weight-bold mb-0">{{ $employee->nip }}</p>
+                                                        <span class="badge bg-primary font-weight-bold text-white">{{ $employee->nip }}</span>
                                                     </td>
                                                     <td class="text-center">
                                                         <p class="text-xs font-weight-bold mb-0">{{ $employee->address }}

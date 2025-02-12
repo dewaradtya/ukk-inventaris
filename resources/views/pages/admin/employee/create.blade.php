@@ -44,24 +44,22 @@
                             @enderror
                         </div>
                         @if (auth()->user()->level->name === 'Admin')
-                            <div class="col-md-6">
-                                <div class="mb-3">
-                                    <label for="user_id">Pilih User</label>
-                                    <select name="user_id" id="user_id"
-                                        class="form-control @error('user_id') is-invalid @enderror">
-                                        <option value="">-- Pilih User --</option>
-                                        @foreach ($users as $user)
-                                            @if ($user->employee->isEmpty() && $user->level->name === 'Peminjam')
-                                                <option value="{{ $user->id }}">{{ $user->name }}</option>
-                                            @endif
-                                        @endforeach
-                                    </select>
-                                    @error('user_id')
-                                        <div class="invalid-feedback">
-                                            {{ $message }}
-                                        </div>
-                                    @enderror
-                                </div>
+                            <div class="mb-3">
+                                <label for="user_id">Pilih User</label>
+                                <select name="user_id" id="user_id"
+                                    class="form-control @error('user_id') is-invalid @enderror">
+                                    <option value="">-- Pilih User --</option>
+                                    @foreach ($users as $user)
+                                        @if ($user->employee->isEmpty() && $user->level->name === 'Peminjam')
+                                            <option value="{{ $user->id }}">{{ $user->name }}</option>
+                                        @endif
+                                    @endforeach
+                                </select>
+                                @error('user_id')
+                                    <div class="invalid-feedback">
+                                        {{ $message }}
+                                    </div>
+                                @enderror
                             </div>
                         @endif
                     </div>

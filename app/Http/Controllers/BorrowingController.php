@@ -2,36 +2,49 @@
 
 namespace App\Http\Controllers;
 
+use App\Exports\BorrowingExport;
 use App\Models\Borrowing;
 use App\Models\Employee;
+use App\Models\Fine;
 use App\Models\Inventory;
 use App\Models\LoanDetail;
 use Barryvdh\DomPDF\Facade\Pdf;
 use Illuminate\Http\Request;
+use Maatwebsite\Excel\Facades\Excel;
 
 class BorrowingController extends Controller
 {
     /**
      * Display a listing of the resource.
      */
-    public function index()
+    public function index(Request $request)
     {
         $user = auth()->user();
+        $search = $request->input('search');
+
+        $query = Borrowing::where('loan_status', 'borrow');
 
         if ($user->level->name === 'Peminjam') {
             $employee = Employee::where('id_user', $user->id)->first();
 
-            $borrowings = $employee
-                ? Borrowing::where('id_employee', $employee->id)
-                ->where('loan_status', 'borrow')
-                ->with('employee')
-                ->paginate(10)
-                : Borrowing::where('id', null)->paginate(10);
-        } else {
-            $borrowings = Borrowing::where('loan_status', 'borrow')
-                ->with('employee')
-                ->paginate(10);
+            if ($employee) {
+                $query->where('id_employee', $employee->id);
+            } else {
+                $query->where('id', null);
+            }
         }
+
+        if ($search) {
+            $query->where(function ($q) use ($search) {
+                $q->whereHas('employee', function ($subQuery) use ($search) {
+                    $subQuery->where('name', 'like', "%{$search}%");
+                })->orWhereHas('loanDetails.inventory', function ($subQuery) use ($search) {
+                    $subQuery->where('name', 'like', "%{$search}%");
+                });
+            });
+        }
+
+        $borrowings = $query->with('employee', 'loanDetails.inventory')->paginate(10);
 
         return view('pages.admin.borrowing.index', [
             'borrowings'  => $borrowings,
@@ -101,9 +114,11 @@ class BorrowingController extends Controller
         return redirect()->route('borrowing.index')->with('success', 'Borrowing dan Loan Detail berhasil ditambahkan');
     }
 
-    /**
-     * Show the form for editing the specified resource.
-     */
+    public function show(string $id)
+    {
+        //
+    }
+
     public function edit(string $id)
     {
         $borrowing = Borrowing::findOrFail($id);
@@ -125,7 +140,6 @@ class BorrowingController extends Controller
     {
         $request->validate([
             'borrow_date' => 'required|date',
-            'return_date' => 'nullable|date|after_or_equal:borrow_date',
             'id_inventories' => 'required|array',
             'id_inventories.*' => 'exists:inventories,id',
             'amount' => 'required|array',
@@ -158,11 +172,19 @@ class BorrowingController extends Controller
 
         $borrowing->loanDetails()->delete();
 
-        $borrowing->update([
+        $updateData = [
             'borrow_date' => $request->borrow_date,
-            'return_date' => $request->return_date,
             'id_employee' => $idEmployee,
-        ]);
+        ];
+
+        if (auth()->user()->level->name === 'Admin') {
+            $request->validate([
+                'return_date' => 'nullable|date|after_or_equal:borrow_date',
+            ]);
+            $updateData['return_date'] = $request->return_date;
+        }
+
+        $borrowing->update($updateData);
 
         foreach ($request->id_inventories as $index => $inventoryId) {
             $amount = $request->amount[$index];
@@ -206,8 +228,12 @@ class BorrowingController extends Controller
     {
         $borrowing = Borrowing::findOrFail($id);
 
-        if (!in_array($request->loan_status, ['borrow', 'return'])) {
-            return response()->json(['success' => false], 400);
+        $request->validate([
+            'loan_status' => 'required|in:borrow,return',
+        ]);
+
+        if ($request->loan_status === 'return' && !in_array(auth()->user()->level->name, ['Admin', 'Operator'])) {
+            return redirect()->back()->with('error', 'Hanya Admin dan Operator yang dapat mengonfirmasi pengembalian.');
         }
 
         if ($request->loan_status === 'return' && $borrowing->loan_status !== 'return') {
@@ -217,12 +243,54 @@ class BorrowingController extends Controller
                     $inventory->increment('amount', $loanDetail->amount);
                 }
             }
+
+            $borrowing->actual_return_date = now();
+            $borrowing->save();
+
+            $fineAmount = $this->calculateFine($borrowing);
+
+            if ($fineAmount > 0) {
+                Fine::create([
+                    'borrowing_id' => $borrowing->id,
+                    'fine_amount' => $fineAmount,
+                    'status' => 'unpaid',
+                ]);
+            }
         }
 
         $borrowing->loan_status = $request->loan_status;
         $borrowing->save();
 
-        return redirect()->route('borrowing.index')->with('success', 'Borrowing berhasil diperbarui');
+        return redirect()->route('borrowing.index')->with('success', 'Status peminjaman berhasil diperbarui.');
+    }
+
+    private function calculateFine($borrowing)
+    {
+        if (!$borrowing->actual_return_date || !$borrowing->return_date) {
+            return 0;
+        }
+
+        $lateDays = \Carbon\Carbon::parse($borrowing->return_date)->diffInDays($borrowing->actual_return_date, false);
+
+        return $lateDays > 0 ? $lateDays * 5000 : 0;
+    }
+
+
+    public function export(Request $request)
+    {
+        $borrowingIds = $request->query('ids');
+
+        if ($borrowingIds) {
+            $borrowingIdsArray = explode(',', $borrowingIds);
+            $borrowings = Borrowing::with(['employee', 'loanDetails.inventory'])
+                ->whereIn('id', $borrowingIdsArray)
+                ->get();
+        } else {
+            $borrowings = Borrowing::with(['employee', 'loanDetails.inventory'])
+                ->get();
+        }
+
+        return Excel::download(new BorrowingExport($borrowings), 'borrowing.xlsx');
     }
 
     public function proof(string $id)
