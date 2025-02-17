@@ -23,6 +23,14 @@
                                             </span>
                                         </div>
                                     </form>
+
+                                    <div class="d-flex gap-2">
+                                        @if (Auth::check() && Auth::user()->level->name === 'Admin')
+                                            <button id="export-selected" class="btn bg-gradient-success btn-sm">
+                                                Export Data
+                                            </button>
+                                        @endif
+                                    </div>
                                 </div>
                             </div>
                         </div>
@@ -31,6 +39,9 @@
                                 <table class="table table-hover table-striped align-items-center mb-0">
                                     <thead>
                                         <tr>
+                                            <th class="text-center text-secondary text-xxs font-weight-bolder opacity-7">
+                                                <input type="checkbox" id="select-all">
+                                            </th>
                                             <th class="text-center text-secondary text-xxs font-weight-bolder opacity-7">
                                                 Tanggal Peminjaman
                                             </th>
@@ -57,6 +68,10 @@
                                     <tbody>
                                         @forelse ($returns as $return)
                                             <tr>
+                                                <td class="text-center">
+                                                    <input type="checkbox" class="return-checkbox"
+                                                        value="{{ $return->id }}">
+                                                </td>
                                                 <td class="text-center">
                                                     <h6 class="mb-0 text-xs">
                                                         {{ \Carbon\Carbon::parse($return->borrow_date)->translatedFormat('d M Y') }}
@@ -103,7 +118,7 @@
                                                         <a href="#" class="open-action-modal text-danger"
                                                             data-id="{{ $return->id }}" data-bs-toggle="tooltip"
                                                             data-bs-placement="top" title="Klik untuk melakukan aksi"
-                                                            data-edit="{{ route('borrowing.edit', $return->id) }}"
+                                                            data-edit="{{ route('return.edit', $return->id) }}"
                                                             data-proof="{{ route('return.proof', $return->id) }}"
                                                             data-delete="{{ route('borrowing.destroy', $return->id) }}"
                                                             data-loan-status="{{ $return->loan_status }}">
@@ -135,4 +150,34 @@
 
     @include('pages.admin.return.modal')
 
+    <script>
+        document.addEventListener("DOMContentLoaded", function() {
+            const selectAllCheckbox = document.getElementById("select-all");
+            const checkboxes = document.querySelectorAll(".return-checkbox");
+            const exportButton = document.getElementById("export-selected");
+
+            selectAllCheckbox.addEventListener("change", function() {
+                checkboxes.forEach(checkbox => {
+                    checkbox.checked = selectAllCheckbox.checked;
+                });
+            });
+
+            exportButton.addEventListener("click", function() {
+                let selectedIds = [];
+                checkboxes.forEach(checkbox => {
+                    if (checkbox.checked) {
+                        selectedIds.push(checkbox.value);
+                    }
+                });
+
+                if (selectedIds.length === 0) {
+                    alert("Silakan pilih setidaknya satu data untuk diekspor.");
+                    return;
+                }
+
+                let exportUrl = "{{ route('borrowing.export') }}" + "?ids=" + selectedIds.join(",");
+                window.location.href = exportUrl;
+            });
+        });
+    </script>
 @endsection

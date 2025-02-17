@@ -117,7 +117,7 @@
                                                         data-paid="{{ $fine->paid_amount }}"
                                                         data-remaining="{{ $fine->remaining_amount }}"
                                                         data-bs-toggle="modal" data-bs-target="#payModal">
-                                                        <i class="fa fa-money text-success fa-lg" data-bs-toggle="tooltip"
+                                                        <i class="fas fa-money-bill-wave text-success fa-lg" data-bs-toggle="tooltip"
                                                             data-bs-placement="top" title="Bayar"></i>
                                                     </button>
 

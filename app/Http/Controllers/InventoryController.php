@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use App\Exports\InventoryExport;
 use App\Models\Inventory;
+use App\Models\LoanDetail;
 use App\Models\user;
 use App\Models\Room;
 use App\Models\Type;
@@ -158,6 +159,10 @@ class InventoryController extends Controller
     public function destroy(string $id)
     {
         $inventory = Inventory::findOrFail($id);
+        $isUsed = LoanDetail::where('id_inventories', $id)->exists();
+        if ($isUsed) {
+            return redirect()->back()->with(['error' => 'Data tidak dapat dihapus karena sedang digunakan di Peminjaman!']);
+        }
         $inventory->delete();
 
         return redirect()->route('inventory.index')->with('success', 'Data berhasil dihapus!');

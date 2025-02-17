@@ -68,15 +68,32 @@ class ReturnController extends Controller
      */
     public function edit(string $id)
     {
-        //
+        $return = Borrowing::findOrFail($id);
+        $employees = Employee::all();
+        $inventories = Inventory::all();
+
+        return view('pages.admin.return.edit', [
+            'return' => $return,
+            'employees' => $employees,
+            'inventories' => $inventories,
+        ]);
     }
 
     /**
      * Update the specified resource in storage.
      */
-    public function update(Request $request, string $id)
+    public function update(Request $request, $id)
     {
-        //
+        $request->validate([
+            'loan_status' => 'required|in:borrow,returned',
+        ]);
+
+        $return = Borrowing::findOrFail($id);
+        $return->update([
+            'loan_status' => $request->loan_status,
+        ]);
+
+        return redirect()->route('return.index')->with('success', 'Status pengembalian berhasil diperbarui.');
     }
 
     /**

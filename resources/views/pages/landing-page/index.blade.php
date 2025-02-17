@@ -34,9 +34,10 @@
                     </li>
                 </ul>
                 <button type="button" class="rounded-pill btn-rounded"
-                    onclick="window.location.href='{{ route('login') }}'">
-                    Login <span><i class="fas fa-arrow-right"></i></span>
+                    onclick="window.location.href='{{ auth()->check() ? url('dashboard') : route('login') }}'">
+                    {{ auth()->check() ? 'Dashboard' : 'Login' }} <span><i class="fas fa-arrow-right"></i></span>
                 </button>
+
             </div>
         </div>
     </nav>

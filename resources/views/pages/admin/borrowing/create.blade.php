@@ -51,7 +51,7 @@
                     <button type="button" id="add-more-inventory" class="btn btn-sm btn-success">Tambah Inventaris
                     </button>
 
-                    @if (auth()->user()->level->name === 'Admin')
+                    @if (Auth::check() && in_array(Auth::user()->level->name, ['Admin', 'Operator']))
                         <div class="form-floating mt-3">
                             <select name="id_employee" id="id_employee" class="form-control" required>
                                 <option value="">-- Pilih Pegawai --</option>

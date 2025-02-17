@@ -5,6 +5,7 @@ use App\Http\Controllers\ChangePasswordController;
 use App\Http\Controllers\DashboardController;
 use App\Http\Controllers\EmployeeController;
 use App\Http\Controllers\FineController;
+use App\Http\Controllers\GoogleController;
 use App\Http\Controllers\HomeController;
 use App\Http\Controllers\InfoUserController;
 use App\Http\Controllers\InventoryController;
@@ -42,12 +43,13 @@ Route::group(['middleware' => 'auth'], function () {
 	Route::middleware(['auth', 'userakses:Admin,Operator'])->group(function () {
 		Route::put('/borrowing/{id}/update-status', [BorrowingController::class, 'updateStatus'])
 			->name('borrowing.updateStatus');
+		Route::resource('/return', ReturnController::class);
+		Route::get('/return/{id}/proof', [ReturnController::class, 'proof'])->name('return.proof');
 	});
 	Route::resource('/employee', EmployeeController::class);
 	Route::resource('/borrowing', BorrowingController::class);
 	Route::get('/borrowing/{id}/proof', [BorrowingController::class, 'proof'])->name('borrowing.proof');
-	Route::resource('/return', ReturnController::class);
-	Route::get('/return/{id}/proof', [ReturnController::class, 'proof'])->name('return.proof');
+	Route::get('/return', [ReturnController::class, 'index'])->name('return.index');
 	Route::get('/logout', [SessionsController::class, 'destroy']);
 	Route::get('/user-profile', [InfoUserController::class, 'create'])->name('userProfile.create');
 	Route::post('/user-profile', [InfoUserController::class, 'store']);
@@ -59,8 +61,6 @@ Route::group(['middleware' => 'auth'], function () {
 	})->name('sign-up');
 });
 
-
-
 Route::group(['middleware' => 'guest'], function () {
 	Route::get('/register', [RegisterController::class, 'create']);
 	Route::post('/register', [RegisterController::class, 'store']);
@@ -70,6 +70,8 @@ Route::group(['middleware' => 'guest'], function () {
 	Route::post('/forgot-password', [ResetController::class, 'sendEmail']);
 	Route::get('/reset-password/{token}', [ResetController::class, 'resetPass'])->name('password.reset');
 	Route::post('/reset-password', [ChangePasswordController::class, 'changePassword'])->name('password.update');
+	Route::get('/auth/google', [GoogleController::class, 'redirect'])->name('google.login');
+	Route::get('/auth/google/callback', [GoogleController::class, 'callback']);
 });
 
 Route::get('/login', function () {

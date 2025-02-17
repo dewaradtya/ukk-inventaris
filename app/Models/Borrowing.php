@@ -14,6 +14,7 @@ class Borrowing extends Model
         'borrow_date',
         'return_date',
         'loan_status',
+        'actual_return_date',
         'id_employee'
     ];
 

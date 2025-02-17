@@ -10,6 +10,7 @@ use App\Models\Inventory;
 use App\Models\LoanDetail;
 use Barryvdh\DomPDF\Facade\Pdf;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\DB;
 use Maatwebsite\Excel\Facades\Excel;
 
 class BorrowingController extends Controller
@@ -90,28 +91,51 @@ class BorrowingController extends Controller
             $idEmployee = $request->id_employee;
         }
 
-        $returnDate = date('Y-m-d', strtotime($request->borrow_date . ' +7 days'));
+        $activeBorrowings = Borrowing::where('id_employee', $idEmployee)
+            ->where('loan_status', 'borrow')
+            ->count();
 
-        $borrowing = Borrowing::create([
-            'borrow_date' => $request->borrow_date,
-            'return_date' => $returnDate,
-            'loan_status' => 'borrow',
-            'id_employee' => $idEmployee,
-        ]);
-
-        foreach ($request->id_inventories as $key => $inventoryId) {
-            LoanDetail::create([
-                'id_borrowing' => $borrowing->id,
-                'id_inventories' => $inventoryId,
-                'amount' => $request->amount[$key],
-            ]);
-
-            $inventory = Inventory::find($inventoryId);
-            $inventory->amount -= $request->amount[$key];
-            $inventory->save();
+        if ($activeBorrowings >= 3) {
+            return redirect()->back()->with('error', 'Anda sudah memiliki 3 peminjaman aktif. Kembalikan salah satu sebelum meminjam lagi.');
         }
 
-        return redirect()->route('borrowing.index')->with('success', 'Borrowing dan Loan Detail berhasil ditambahkan');
+        $returnDate = date('Y-m-d', strtotime($request->borrow_date . ' +7 days'));
+
+        DB::beginTransaction();
+
+        try {
+            $borrowing = Borrowing::create([
+                'borrow_date' => $request->borrow_date,
+                'return_date' => $returnDate,
+                'loan_status' => 'borrow',
+                'id_employee' => $idEmployee,
+            ]);
+
+            foreach ($request->id_inventories as $key => $inventoryId) {
+                $inventory = Inventory::find($inventoryId);
+                $requestedAmount = $request->amount[$key];
+
+                if ($inventory->amount < $requestedAmount) {
+                    return redirect()->back()->with('error', "Stok untuk {$inventory->name} tidak mencukupi. Tersedia: {$inventory->amount}");
+                }
+
+                LoanDetail::create([
+                    'id_borrowing' => $borrowing->id,
+                    'id_inventories' => $inventoryId,
+                    'amount' => $requestedAmount,
+                ]);
+
+                $inventory->amount -= $requestedAmount;
+                $inventory->save();
+            }
+
+            DB::commit();
+
+            return redirect()->route('borrowing.index')->with('success', 'Borrowing dan Loan Detail berhasil ditambahkan');
+        } catch (\Exception $e) {
+            DB::rollBack();
+            return redirect()->back()->with('error', 'Terjadi kesalahan saat meminjam. Silakan coba lagi.');
+        }
     }
 
     public function show(string $id)
