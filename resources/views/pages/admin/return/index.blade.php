@@ -129,7 +129,7 @@
                                             </tr>
                                         @empty
                                             <tr>
-                                                <td colspan="7" class="text-center">Belum ada data pengembalian
+                                                <td colspan="8" class="text-center">Belum ada data pengembalian
                                                 </td>
                                             </tr>
                                         @endforelse

@@ -6,9 +6,11 @@ use App\Exports\BorrowingExport;
 use App\Models\Borrowing;
 use App\Models\Employee;
 use App\Models\Fine;
+use App\Models\FineSetting;
 use App\Models\Inventory;
 use App\Models\LoanDetail;
 use Barryvdh\DomPDF\Facade\Pdf;
+use Carbon\Carbon;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 use Maatwebsite\Excel\Facades\Excel;
@@ -294,9 +296,24 @@ class BorrowingController extends Controller
             return 0;
         }
 
-        $lateDays = \Carbon\Carbon::parse($borrowing->return_date)->diffInDays($borrowing->actual_return_date, false);
+        $fineSetting = FineSetting::first();
 
-        return $lateDays > 0 ? $lateDays * 5000 : 0;
+        if (!$fineSetting) {
+            return 0;
+        }
+
+        $lateDays = Carbon::parse($borrowing->return_date)->diffInDays($borrowing->actual_return_date, false);
+        $fineAmount = 0;
+
+        if ($lateDays > 0) {
+            $fineAmount = $lateDays * $fineSetting->late_fee;
+        }
+
+        if ($borrowing->is_lost) {
+            $fineAmount += $fineSetting->lost_fee;
+        }
+
+        return $fineAmount;
     }
 
 

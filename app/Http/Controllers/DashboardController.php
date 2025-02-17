@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use App\Models\Borrowing;
 use App\Models\Employee;
+use App\Models\Inventory;
 use App\Models\LoanDetail;
 
 class DashboardController extends Controller
@@ -11,6 +12,8 @@ class DashboardController extends Controller
     public function index()
     {
         $user = auth()->user();
+
+        $inventorys = Inventory::all();
 
         if ($user->level->name === 'Peminjam') {
             $employee = Employee::where('id_user', $user->id)->first();
@@ -88,7 +91,7 @@ class DashboardController extends Controller
         });
 
         return view('dashboard', [
-            'totalBorrowings'   => $borrowings->count(),
+            'totalInventorys'   => $inventorys->count(),
             'totalBorrowed'     => $borrowings->where('loan_status', 'borrow')->count(),
             'totalReturned'     => $borrowings->where('loan_status', 'return')->count(),
             'totalUsers'        => Employee::count(),

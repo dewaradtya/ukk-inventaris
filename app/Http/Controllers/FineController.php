@@ -43,7 +43,7 @@ class FineController extends Controller
 
         $request->validate([
             'payment_amount' => 'required|numeric|min:1',
-            'payment_proof' => 'nullable|file|mimes:jpg,jpeg,png,pdf',
+            'payment_proof' => 'nullable|file|mimes:jpg,jpeg,png,pdf|max:2048',
         ]);
 
         $paymentAmount = $request->payment_amount;
@@ -54,18 +54,17 @@ class FineController extends Controller
         }
 
         if ($request->hasFile('payment_proof')) {
-            $proofPath = $request->file('payment_proof')->store('payment_proofs', 'public');
+            if ($fine->payment_proof) {
+                \Storage::disk('public')->delete($fine->payment_proof);
+            }
+
+            $proofPath = $request->file('payment_proof')->store('img/payment_proofs', 'public');
             $fine->payment_proof = $proofPath;
         }
 
         $fine->paid_amount += $paymentAmount;
 
-        if ($fine->paid_amount >= $fine->fine_amount) {
-            $fine->status = 'paid';
-        } else {
-            $fine->status = 'partial';
-        }
-
+        $fine->status = $fine->paid_amount >= $fine->fine_amount ? 'paid' : 'partial';
         $fine->save();
 
         return redirect()->route('fine.index')->with('success', 'Denda berhasil dibayar.');

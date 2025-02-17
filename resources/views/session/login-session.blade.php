@@ -58,14 +58,6 @@
                                         </div>
                                         <div class="d-flex justify-content-center gap-2">
                                             <a class="btn btn-outline-secondary d-flex align-items-center justify-content-center"
-                                                style="width: 50px; height: 50px;" href="javascript:;">
-                                                <i class="fa-brands fa-facebook fa-2x text-info"></i>
-                                            </a>
-                                            <a class="btn btn-outline-secondary d-flex align-items-center justify-content-center"
-                                                style="width: 50px; height: 50px;" href="javascript:;">
-                                                <i class="fa-brands fa-apple fa-2x text-dark"></i>
-                                            </a>
-                                            <a class="btn btn-outline-secondary d-flex align-items-center justify-content-center"
                                                 style="width: 50px; height: 50px;" href="{{ route('google.login') }}">
                                                 <i class="fa-brands fa-google fa-2x text-danger"></i>
                                             </a>

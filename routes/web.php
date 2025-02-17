@@ -5,6 +5,7 @@ use App\Http\Controllers\ChangePasswordController;
 use App\Http\Controllers\DashboardController;
 use App\Http\Controllers\EmployeeController;
 use App\Http\Controllers\FineController;
+use App\Http\Controllers\FineSettingController;
 use App\Http\Controllers\GoogleController;
 use App\Http\Controllers\HomeController;
 use App\Http\Controllers\InfoUserController;
@@ -44,12 +45,14 @@ Route::group(['middleware' => 'auth'], function () {
 		Route::put('/borrowing/{id}/update-status', [BorrowingController::class, 'updateStatus'])
 			->name('borrowing.updateStatus');
 		Route::resource('/return', ReturnController::class);
-		Route::get('/return/{id}/proof', [ReturnController::class, 'proof'])->name('return.proof');
+		Route::get('fine-settings', [FineSettingController::class, 'index'])->name('fine.settings');
+		Route::put('fine/settings', [FineSettingController::class, 'update'])->name('fine.settings.update');
 	});
 	Route::resource('/employee', EmployeeController::class);
 	Route::resource('/borrowing', BorrowingController::class);
 	Route::get('/borrowing/{id}/proof', [BorrowingController::class, 'proof'])->name('borrowing.proof');
 	Route::get('/return', [ReturnController::class, 'index'])->name('return.index');
+	Route::get('/return/{id}/proof', [ReturnController::class, 'proof'])->name('return.proof');
 	Route::get('/logout', [SessionsController::class, 'destroy']);
 	Route::get('/user-profile', [InfoUserController::class, 'create'])->name('userProfile.create');
 	Route::post('/user-profile', [InfoUserController::class, 'store']);
