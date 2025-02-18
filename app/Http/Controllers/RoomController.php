@@ -2,125 +2,61 @@
 
 namespace App\Http\Controllers;
 
-use App\Exports\RoomExport;
-use App\Models\Inventory;
-use App\Models\Room;
+use App\Http\Requests\RoomStoreRequest;
+use App\Http\Requests\RoomUpdateRequest;
+use App\Services\RoomService;
 use Illuminate\Http\Request;
 use Maatwebsite\Excel\Facades\Excel;
 
 class RoomController extends Controller
 {
-    /**
-     * Display a listing of the resource.
-     */
+    protected $roomService;
+
+    public function __construct(RoomService $roomService)
+    {
+        $this->roomService = $roomService;
+    }
+
     public function index(Request $request)
     {
-        $query = Room::query();
-
-        if ($request->has('search') && $request->search != '') {
-            $query->where('name', 'like', '%' . $request->search . '%')
-                ->orWhere('code', 'like', '%' . $request->search . '%');
-        }
-
-        $rooms = $query->paginate(10);
-
+        $rooms = $this->roomService->getAllRooms($request->search);
         return view('pages.admin.room.index', compact('rooms'));
     }
 
-    /**
-     * Show the form for creating a new resource.
-     */
     public function create()
     {
         return view('pages.admin.room.create');
     }
 
-    /**
-     * Menyimpan room baru ke database.
-     */
-    public function store(Request $request)
+    public function store(RoomStoreRequest $request)
     {
-        $request->validate([
-            'name' => 'required',
-            'code' => 'required|unique:rooms',
-            'information' => 'required'
-        ]);
-
-        $rooms = Room::create([
-            'name' => $request->name,
-            'code' => $request->code,
-            'information' => $request->information
-        ]);
-
-        return redirect()->route('room.index')->with('success', 'room berhasil ditambahkan');
+        $this->roomService->createRoom($request->validated());
+        return redirect()->route('room.index')->with('success', 'Room berhasil ditambahkan');
     }
 
-    /**
-     * Display the specified resource.
-     */
-    public function show(string $id)
-    {
-        //
-    }
-
-    /**
-     * Show the form for editing the specified resource.
-     */
     public function edit(string $id)
     {
-        $room = Room::findOrFail($id);
-        return view('pages.admin.room.edit', [
-            'room' => $room,
-        ]);
+        $room = $this->roomService->getRoomById($id);
+        return view('pages.admin.room.edit', compact('room'));
     }
 
-    /**
-     * Update the specified resource in storage.
-     */
-    public function update(Request $request, string $id)
+    public function update(RoomUpdateRequest $request, string $id)
     {
-        $request->validate([
-            'name' => 'required',
-            'code' => 'required|unique:rooms,code,' . $id,
-            'information' => 'required'
-        ]);
-
-        $room = Room::findOrFail($id);
-
-        $room->name = $request->name;
-        $room->code = $request->code;
-        $room->information = $request->information;
-        $room->save();
-
+        $this->roomService->updateRoom($id, $request->validated());
         return redirect()->route('room.index')->with('success', 'Room berhasil diperbarui');
     }
 
-    /**
-     * Remove the specified resource from storage.
-     */
     public function destroy(string $id)
     {
-        $room = Room::findOrFail($id);
-        $isUsed = Inventory::where('id_room', $id)->exists();
-        if ($isUsed) {
-            return redirect()->back()->with(['error' => 'Data tidak dapat dihapus karena sedang digunakan di Inventory!']);
+        if (!$this->roomService->deleteRoom($id)) {
+            return redirect()->back()->with('error', 'Data tidak dapat dihapus karena sedang digunakan di Inventory!');
         }
-        $room->delete();
-
         return redirect()->route('room.index')->with('success', 'Data berhasil dihapus!');
     }
 
     public function export(Request $request)
     {
-        $roomIds = $request->query('ids');
-
-        if ($roomIds) {
-            $roomIdsArray = explode(',', $roomIds);
-            $rooms = Room::whereIn('id', $roomIdsArray)->get(['name', 'code', 'information']);
-        } else {
-            $rooms = Room::all(['name', 'code', 'information']);
-        }
-
-        return Excel::download(new RoomExport($rooms), 'Ruang Inventaris.xlsx');
+        $file = $this->roomService->exportRooms($request->query('ids'));
+        return Excel::download($file, 'Ruang Inventaris.xlsx');
     }
 }

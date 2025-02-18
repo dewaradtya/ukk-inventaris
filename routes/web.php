@@ -27,6 +27,8 @@ Route::get('home', function () {
 	return view('pages/landing-page/index');
 })->name('home');
 
+Route::view('/docs', 'documentation.index');
+
 Route::group(['middleware' => 'auth'], function () {
 	Route::resource('dashboard', DashboardController::class);
 
@@ -40,6 +42,7 @@ Route::group(['middleware' => 'auth'], function () {
 		Route::get('/inventory-export', [InventoryController::class, 'export'])->name('inventory.export');
 		Route::resource('/user-management', UserManagementController::class);
 		Route::get('/borrowing/export', [BorrowingController::class, 'export'])->name('borrowing.export');
+		Route::get('/return/export', [ReturnController::class, 'export'])->name('return.export');
 	});
 	Route::middleware(['auth', 'userakses:Admin,Operator'])->group(function () {
 		Route::put('/borrowing/{id}/update-status', [BorrowingController::class, 'updateStatus'])

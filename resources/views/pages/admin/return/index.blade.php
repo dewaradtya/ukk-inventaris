@@ -14,7 +14,7 @@
                                 </div>
 
                                 <div class="d-flex flex-column flex-sm-row gap-2 w-100 w-md-auto">
-                                    <form action="{{ route('room.index') }}" method="GET" class="w-100 w-sm-auto">
+                                    <form action="{{ route('return.index') }}" method="GET" class="w-100 w-sm-auto">
                                         <div class="input-group input-group-sm">
                                             <input type="text" name="search" class="form-control form-control-sm"
                                                 placeholder="Cari nama atau kode..." value="{{ request('search') }}">
@@ -175,7 +175,7 @@
                     return;
                 }
 
-                let exportUrl = "{{ route('borrowing.export') }}" + "?ids=" + selectedIds.join(",");
+                let exportUrl = "{{ route('return.export') }}" + "?ids=" + selectedIds.join(",");
                 window.location.href = exportUrl;
             });
         });

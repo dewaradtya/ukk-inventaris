@@ -2,7 +2,6 @@
 
 namespace App\Exports;
 
-use App\Models\Borrowing;
 use Maatwebsite\Excel\Concerns\FromCollection;
 use Maatwebsite\Excel\Concerns\WithHeadings;
 use Maatwebsite\Excel\Concerns\WithMapping;
@@ -12,18 +11,18 @@ use PhpOffice\PhpSpreadsheet\Style\Border;
 use PhpOffice\PhpSpreadsheet\Style\Fill;
 use PhpOffice\PhpSpreadsheet\Worksheet\Worksheet;
 
-class BorrowingExport implements FromCollection, WithHeadings, WithMapping, ShouldAutoSize, WithStyles
+class ReturnExport implements FromCollection, WithHeadings, WithMapping, ShouldAutoSize, WithStyles
 {
-    protected $borrowings;
+    protected $returns;
 
-    public function __construct($borrowings)
+    public function __construct($returns)
     {
-        $this->borrowings = $borrowings;
+        $this->returns = $returns;
     }
 
     public function collection()
     {
-        return $this->borrowings;
+        return $this->returns;
     }
 
     public function headings(): array
@@ -31,23 +30,25 @@ class BorrowingExport implements FromCollection, WithHeadings, WithMapping, Shou
         return [
             "Tanggal Peminjaman",
             "Tanggal Pengembalian",
+            "Tanggal Dikembalikan",
             "Status",
             "Pegawai",
             "Inventaris Dipinjam",
         ];
     }
 
-    public function map($borrowing): array
+    public function map($return): array
     {
-        $inventories = $borrowing->loanDetails->map(function ($loanDetail) {
+        $inventories = $return->loanDetails->map(function ($loanDetail) {
             return optional($loanDetail->inventory)->name . ' (' . $loanDetail->amount . ')';
         })->implode(', ');
 
         return [
-            $borrowing->borrow_date,
-            $borrowing->return_date ?? '-',
-            ucfirst($borrowing->loan_status),
-            optional($borrowing->employee)->name ?? 'N/A',
+            $return->borrow_date,
+            $return->return_date ?? '-',
+            $return->actual_return_date,
+            ucfirst($return->loan_status),
+            optional($return->employee)->name ?? 'N/A',
             $inventories,
         ];
     }
@@ -57,7 +58,7 @@ class BorrowingExport implements FromCollection, WithHeadings, WithMapping, Shou
         $lastRow = $sheet->getHighestRow();
         $lastColumn = $sheet->getHighestColumn();
 
-        $sheet->setTitle('Borrowing');
+        $sheet->setTitle('Return');
 
         $sheet->getStyle('A1:' . $lastColumn . '1')->applyFromArray([
             'font' => [

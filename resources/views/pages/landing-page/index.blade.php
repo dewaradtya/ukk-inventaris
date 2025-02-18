@@ -6,6 +6,8 @@
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <title>Invesapra</title>
+    <link rel="apple-touch-icon" sizes="76x76" href="{{ asset('assets/img/logo.png') }}">
+    <link rel="icon" type="image/png" href="{{ asset('assets/img/logo.png') }}">
     <link rel="stylesheet" href="{{ asset('assets1/css/style.css') }}">
     <link rel="stylesheet" href="{{ asset('assets1/css/fontawesome.css') }}">
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/glightbox/dist/css/glightbox.min.css" />
@@ -30,7 +32,6 @@
                     <li class="nav-item"><a class="nav-link" href="#services">Services</a></li>
                     <li class="nav-item"><a class="nav-link" href="#testimonials">Testimonials</a></li>
                     <li class="nav-item"><a class="nav-link" href="#faq">faq</a></li>
-                    <li class="nav-item"><a class="nav-link" href="#contact">contact</a>
                     </li>
                 </ul>
                 <button type="button" class="rounded-pill btn-rounded"
@@ -58,7 +59,9 @@
                             efisien!
                         </span>
                     </h1>
-                    <button type="button" class="rounded-pill btn-rounded">Mulai Sekarang
+                    <button type="button" class="rounded-pill btn-rounded"
+                        onclick="window.location.href='{{ auth()->check() ? url('dashboard') : route('login') }}'">
+                        {{ auth()->check() ? 'Dashboard' : 'Mulai Sekarang' }}
                         <span><i class="fas fa-arrow-right"></i></span>
                     </button>
                 </div>
@@ -483,69 +486,6 @@
         </div>
     </section>
 
-    <!-- /////////////////////////////////////////////////////////////////////////////////////////////////////////
-              START SECTION 7 - GET STARTED
-/////////////////////////////////////////////////////////////////////////////////////////////////////////-->
-    <section id="contact" class="get-started">
-        <div class="container">
-            <div class="row text-center">
-                <h1 class="display-3 fw-bold text-capitalize">Get started</h1>
-                <div class="heading-line"></div>
-                <p class="lh-lg">
-                    Lorem ipsum, dolor sit amet consectetur adipisicing elit. Libero illum architecto modi.
-                </p>
-            </div>
-
-            <!-- START THE CTA CONTENT  -->
-            <div class="row text-white">
-                <div class="col-12 col-lg-6 gradient shadow p-3">
-                    <div class="cta-info w-100">
-                        <h4 class="display-4 fw-bold">100% Satisfaction Guaranteed</h4>
-                        <p class="lh-lg">
-                            Lorem ipsum dolor sit amet consectetur adipisicing elit. Aperiam alias optio minima, tempore
-                            architecto sint ipsam dolore tempora facere laboriosam corrupti!
-                        </p>
-                        <h3 class="display-3--brief">What will be the next step?</h3>
-                        <ul class="cta-info__list">
-                            <li>We'll prepare the proposal.</li>
-                            <li>we'll discuss it together.</li>
-                            <li>let's start the discussion.</li>
-                        </ul>
-                    </div>
-                </div>
-                <div class="col-12 col-lg-6 bg-white shadow p-3">
-                    <div class="form w-100 pb-2">
-                        <h4 class="display-3--title mb-5">start your project</h4>
-                        <form action="#" class="row">
-                            <div class="col-lg-6 col-md mb-3">
-                                <input type="text" placeholder="First Name" id="inputFirstName"
-                                    class="shadow form-control form-control-lg">
-                            </div>
-                            <div class="col-lg-6 col-md mb-3">
-                                <input type="text" placeholder="Last Name" id="inputLastName"
-                                    class="shadow form-control form-control-lg">
-                            </div>
-                            <div class="col-lg-12 mb-3">
-                                <input type="email" placeholder="email address" id="inputEmail"
-                                    class="shadow form-control form-control-lg">
-                            </div>
-                            <div class="col-lg-12 mb-3">
-                                <textarea name="message" placeholder="message" id="message" rows="8"
-                                    class="shadow form-control form-control-lg"></textarea>
-                            </div>
-                            <div class="text-center d-grid mt-1">
-                                <button type="button" class="btn btn-primary rounded-pill pt-3 pb-3">
-                                    submit
-                                    <i class="fas fa-paper-plane"></i>
-                                </button>
-                            </div>
-                        </form>
-                    </div>
-                </div>
-            </div>
-        </div>
-    </section>
-
     <!-- ///////////////////////////////////////////////////////////////////////////////////////////
                            START SECTION 9 - THE FOOTER
 ///////////////////////////////////////////////////////////////////////////////////////////////-->
@@ -566,8 +506,8 @@
                         </svg>
                     </div>
                     <div class="contact-box__info">
-                        <a href="#" class="contact-box__info--title">+1 728365413</a>
-                        <p class="contact-box__info--subtitle"> Mon-Fri 9am-6pm</p>
+                        <a href="#" class="contact-box__info--title">+62 123 456 789</a>
+                        <p class="contact-box__info--subtitle"> Sen-Jum 09.00-17.00 wib</p>
                     </div>
                 </div>
                 <!-- CONTENT FOR EMAIL  -->
@@ -584,7 +524,7 @@
                         </svg>
                     </div>
                     <div class="contact-box__info">
-                        <a href="#" class="contact-box__info--title">info@company.com</a>
+                        <a href="#" class="contact-box__info--title">infoinvesapra@gmail.com</a>
                         <p class="contact-box__info--subtitle">Online support</p>
                     </div>
                 </div>
@@ -603,8 +543,8 @@
                         </svg>
                     </div>
                     <div class="contact-box__info">
-                        <a href="#" class="contact-box__info--title">New York, USA</a>
-                        <p class="contact-box__info--subtitle">NY 10012, US</p>
+                        <a href="#" class="contact-box__info--title">Pasuruan, Indonesia</a>
+                        <p class="contact-box__info--subtitle">PS 170225, ID</p>
                     </div>
                 </div>
             </div>
@@ -615,13 +555,11 @@
             <div class="container">
                 <div class="row py-4 text-center text-white">
                     <div class="col-lg-5 col-md-6 mb-4 mb-md-0">
-                        connect with us on social media
+                        terhubung dengan kami di media sosial
                     </div>
                     <div class="col-lg-7 col-md-6">
                         <a href="#"><i class="fab fa-facebook"></i></a>
                         <a href="#"><i class="fab fa-twitter"></i></a>
-                        <a href="#"><i class="fab fa-github"></i></a>
-                        <a href="#"><i class="fab fa-linkedin"></i></a>
                         <a href="#"><i class="fab fa-instagram"></i></a>
                     </div>
                 </div>
@@ -631,42 +569,31 @@
         <!-- START THE CONTENT FOR THE CAMPANY INFO -->
         <div class="container mt-5">
             <div class="row text-white justify-content-center mt-3 pb-3">
-                <div class="col-12 col-sm-6 col-lg-6 mx-auto">
-                    <h5 class="text-capitalize fw-bold">Campany name</h5>
+                <div class="col-12 col-sm-6 mx-auto">
+                    <h5 class="text-capitalize fw-bold">Invesapra</h5>
                     <hr class="bg-white d-inline-block mb-4" style="width: 60px; height: 2px;">
                     <p class="lh-lg">
-                        Lorem ipsum dolor sit amet consectetur adipisicing elit. Dolorem ex obcaecati blanditiis
-                        reprehenderit ab mollitia voluptatem consectetur?
+                        Solusi modern untuk manajemen inventaris sarana dan prasarana di SMK. Mudah, cepat, dan
+                        efisien!
                     </p>
                 </div>
-                <div class="col-12 col-sm-6 col-lg-2 mb-4 mx-auto">
-                    <h5 class="text-capitalize fw-bold">Products</h5>
+                <div class="col-12 col-sm-3 mb-4 mx-auto">
+                    <h5 class="text-capitalize fw-bold">Menu</h5>
                     <hr class="bg-white d-inline-block mb-4" style="width: 60px; height: 2px;">
                     <ul class="list-inline campany-list">
-                        <li><a href="#">Lorem ipsum</a></li>
-                        <li><a href="#">Lorem ipsum</a></li>
-                        <li><a href="#">Lorem ipsum</a></li>
-                        <li><a href="#">Lorem ipsum</a></li>
+                        <li><a href="/">Home</a></li>
+                        <li><a href="#services">Services</a></li>
+                        <li><a href="#testimonials">Testimonials</a></li>
+                        <li><a href="#faq">Faq</a></li>
                     </ul>
                 </div>
-                <div class="col-12 col-sm-6 col-lg-2 mb-4 mx-auto">
+                <div class="col-12 col-sm-3 mb-4 mx-auto">
                     <h5 class="text-capitalize fw-bold">useful links</h5>
                     <hr class="bg-white d-inline-block mb-4" style="width: 60px; height: 2px;">
                     <ul class="list-inline campany-list">
-                        <li><a href="#"> Your Account</a></li>
-                        <li><a href="#">Become an Affiliate</a></li>
-                        <li><a href="#">create an account</a></li>
+                        <li><a href="user-profile"> Your Account</a></li>
+                        <li><a href="register">create an account</a></li>
                         <li><a href="#">Help</a></li>
-                    </ul>
-                </div>
-                <div class="col-12 col-sm-6 col-lg-2 mb-4 mx-auto">
-                    <h5 class="text-capitalize fw-bold">contact</h5>
-                    <hr class="bg-white d-inline-block mb-4" style="width: 60px; height: 2px;">
-                    <ul class="list-inline campany-list">
-                        <li><a href="#">Lorem ipsum</a></li>
-                        <li><a href="#">Lorem ipsum</a></li>
-                        <li><a href="#">Lorem ipsum</a></li>
-                        <li><a href="#">Lorem ipsum</a></li>
                     </ul>
                 </div>
             </div>
@@ -678,10 +605,8 @@
                 <div class="row text-center text-white">
                     <div class="col-12">
                         <div class="footer-bottom__copyright">
-                            &COPY; Copyright 2021 <a href="#">Company</a> | Created by <a
-                                href="http://codewithpatrick.com" target="_blank">Muriungi</a><br><br>
-
-                            Distributed by <a href="http://themewagon.com" target="_blank">ThemeWagon</a>
+                            &COPY; Copyright 2025 <a href="#">Invesapra</a> | Created by Dewa Raditya
+                            Rochman<br><br>
                         </div>
                     </div>
                 </div>

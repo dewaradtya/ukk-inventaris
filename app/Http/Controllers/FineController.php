@@ -2,78 +2,49 @@
 
 namespace App\Http\Controllers;
 
-use App\Models\Borrowing;
-use App\Models\Employee;
+use App\Http\Requests\FinePaymentRequest;
 use App\Models\Fine;
+use App\Services\FineService;
 use Illuminate\Http\Request;
 
 class FineController extends Controller
 {
-    public function index(Request $request)
+    protected FineService $fineService;
+
+    public function __construct(FineService $fineService)
     {
-        $user = auth()->user();
-
-        $query = Fine::with('borrowing.employee');
-
-        if ($user->level->name === 'Peminjam') {
-            $employee = Employee::where('id_user', $user->id)->first();
-            if ($employee) {
-                $query->whereHas('borrowing', function ($q) use ($employee) {
-                    $q->where('id_employee', $employee->id);
-                });
-            } else {
-                $query->where('id', null);
-            }
-        }
-
-        $fines = $query->paginate(10);
-        $totalFines = $query->sum('fine_amount');
-        $totalPaid = $query->sum('paid_amount');
-        $totalUnpaid = $query->get()->sum(function ($fine) {
-            return $fine->remaining_amount;
-        });
-        $totalEmployees = Employee::count();
-
-        return view('pages.admin.fine.index', compact('fines', 'totalFines', 'totalPaid', 'totalUnpaid', 'totalEmployees'));
+        $this->fineService = $fineService;
     }
 
-    public function payFine(Request $request, $id)
+    public function index(Request $request)
+    {
+        $totals = $this->fineService->calculateTotals();
+
+        return view('pages.admin.fine.index', [
+            'fines' => $this->fineService->getFines(auth()->user()),
+            'totalFines' => $totals['totalFines'],
+            'totalPaid' => $totals['totalPaid'],
+            'totalUnpaid' => $totals['totalUnpaid'],
+            'totalEmployees' => $totals['totalEmployees'],
+        ]);
+    }
+
+    public function payFine(FinePaymentRequest $request, $id)
     {
         $fine = Fine::findOrFail($id);
 
-        $request->validate([
-            'payment_amount' => 'required|numeric|min:1',
-            'payment_proof' => 'nullable|file|mimes:jpg,jpeg,png,pdf|max:2048',
-        ]);
-
-        $paymentAmount = $request->payment_amount;
-        $remainingAmount = $fine->fine_amount - $fine->paid_amount;
-
-        if ($paymentAmount > $remainingAmount) {
-            return redirect()->back()->with('error', 'Jumlah pembayaran melebihi sisa denda.');
+        try {
+            $this->fineService->processFinePayment($fine, $request->validated());
+            return redirect()->route('fine.index')->with('success', 'Denda berhasil dibayar.');
+        } catch (\Exception $e) {
+            return redirect()->back()->with('error', $e->getMessage());
         }
-
-        if ($request->hasFile('payment_proof')) {
-            if ($fine->payment_proof) {
-                \Storage::disk('public')->delete($fine->payment_proof);
-            }
-
-            $proofPath = $request->file('payment_proof')->store('img/payment_proofs', 'public');
-            $fine->payment_proof = $proofPath;
-        }
-
-        $fine->paid_amount += $paymentAmount;
-
-        $fine->status = $fine->paid_amount >= $fine->fine_amount ? 'paid' : 'partial';
-        $fine->save();
-
-        return redirect()->route('fine.index')->with('success', 'Denda berhasil dibayar.');
     }
 
     public function destroy(string $id)
     {
-        $fines = Fine::findOrFail($id);
-        $fines->delete();
+        $fine = Fine::findOrFail($id);
+        $this->fineService->deleteFine($fine);
 
         return redirect()->route('fine.index')->with('success', 'Data berhasil dihapus!');
     }

@@ -14,10 +14,11 @@ class DashboardController extends Controller
         $user = auth()->user();
 
         $inventorys = Inventory::all();
+        $employee = Employee::where('id_user', $user->id)->first();
+        $idEmployee = optional($employee)->id ?? 0;
 
         if ($user->level->name === 'Peminjam') {
-            $employee = Employee::where('id_user', $user->id)->first();
-            $borrowings = $employee ? Borrowing::where('id_employee', $employee->id)->get() : collect();
+            $borrowings = Borrowing::where('id_employee', $idEmployee)->get();
         } else {
             $borrowings = Borrowing::all();
         }
@@ -29,14 +30,14 @@ class DashboardController extends Controller
 
         $monthlyReturns = Borrowing::selectRaw('YEAR(actual_return_date) as year, MONTH(actual_return_date) as month, COUNT(*) as total')
             ->whereNotNull('actual_return_date')
-            ->where('borrowings.loan_status', 'return')
+            ->where('loan_status', 'return')
             ->groupByRaw('YEAR(actual_return_date), MONTH(actual_return_date)')
             ->orderBy('year', 'asc')
             ->orderBy('month', 'asc');
 
         if ($user->level->name === 'Peminjam') {
-            $monthlyBorrowings->where('id_employee', $employee->id);
-            $monthlyReturns->where('id_employee', $employee->id);
+            $monthlyBorrowings->where('id_employee', $idEmployee);
+            $monthlyReturns->where('id_employee', $idEmployee);
         }
 
         $monthlyBorrowings = $monthlyBorrowings->get();

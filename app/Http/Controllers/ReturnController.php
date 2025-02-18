@@ -2,114 +2,70 @@
 
 namespace App\Http\Controllers;
 
+use App\Exports\BorrowingExport;
+use App\Exports\ReturnExport;
+use App\Http\Requests\ReturnUpdateRequest;
 use App\Models\Borrowing;
 use App\Models\Employee;
 use App\Models\Inventory;
-use Barryvdh\DomPDF\Facade\Pdf;
+use App\Services\ReturnService;
 use Illuminate\Http\Request;
+use Maatwebsite\Excel\Facades\Excel;
 
 class ReturnController extends Controller
 {
-    /**
-     * Display a listing of the resource.
-     */
+    protected $returnService;
+
+    public function __construct(ReturnService $returnService)
+    {
+        $this->returnService = $returnService;
+    }
+
     public function index()
     {
-        $user = auth()->user();
-
-        if ($user->level->name === 'Peminjam') {
-            $employee = Employee::where('id_user', $user->id)->first();
-
-            $returns = $employee
-                ? Borrowing::where('id_employee', $employee->id)
-                ->where('loan_status', 'return')
-                ->with('employee')
-                ->paginate(10)
-                : Borrowing::where('id', null)->paginate(10);
-        } else {
-            $returns = Borrowing::where('loan_status', 'return')
-                ->with('employee')
-                ->paginate(10);
-        }
-
         return view('pages.admin.return.index', [
-            'returns'  => $returns,
-            'employees'   => Employee::all(),
+            'returns'  => $this->returnService->getReturns(auth()->user()),
+            'employees' => Employee::all(),
             'inventories' => Inventory::all(),
         ]);
     }
 
-    /**
-     * Show the form for creating a new resource.
-     */
-    public function create()
-    {
-        //
-    }
-
-    /**
-     * Store a newly created resource in storage.
-     */
-    public function store(Request $request)
-    {
-        //
-    }
-
-    /**
-     * Display the specified resource.
-     */
-    public function show(string $id)
-    {
-        //
-    }
-
-    /**
-     * Show the form for editing the specified resource.
-     */
     public function edit(string $id)
     {
-        $return = Borrowing::findOrFail($id);
-        $employees = Employee::all();
-        $inventories = Inventory::all();
-
         return view('pages.admin.return.edit', [
-            'return' => $return,
-            'employees' => $employees,
-            'inventories' => $inventories,
+            'return' => Borrowing::findOrFail($id),
+            'employees' => Employee::all(),
+            'inventories' => Inventory::all(),
         ]);
     }
 
-    /**
-     * Update the specified resource in storage.
-     */
-    public function update(Request $request, $id)
+    public function update(ReturnUpdateRequest $request, $id)
     {
-        $request->validate([
-            'loan_status' => 'required|in:borrow,returned',
-        ]);
-
-        $return = Borrowing::findOrFail($id);
-        $return->update([
-            'loan_status' => $request->loan_status,
-        ]);
+        $borrowing = Borrowing::findOrFail($id);
+        $this->returnService->updateLoanStatus($borrowing, $request->loan_status);
 
         return redirect()->route('return.index')->with('success', 'Status pengembalian berhasil diperbarui.');
     }
 
-    /**
-     * Remove the specified resource from storage.
-     */
-    public function destroy(string $id)
-    {
-        //
-    }
-
     public function proof(string $id)
     {
-        $borrowing = Borrowing::with('employee', 'loanDetails.inventory')->findOrFail($id);
+        return $this->returnService->generateProof(Borrowing::with('employee', 'loanDetails.inventory')->findOrFail($id));
+    }
 
-        $pdf = Pdf::loadView('pages.admin.return.proof', compact('borrowing'));
+    public function export(Request $request)
+    {
+        $returnIds = $request->query('ids');
 
-        return $pdf->stream('bukti_pengembalian.pdf');
+        if ($returnIds) {
+            $returnIdsArray = explode(',', $returnIds);
+            $returns = Borrowing::with(['employee', 'loanDetails.inventory'])
+                ->whereIn('id', $returnIdsArray)
+                ->get();
+        } else {
+            $returns = Borrowing::with(['employee', 'loanDetails.inventory'])
+                ->get();
+        }
+
+        return Excel::download(new ReturnExport($returns), 'Pengembalian.xlsx');
     }
 }
