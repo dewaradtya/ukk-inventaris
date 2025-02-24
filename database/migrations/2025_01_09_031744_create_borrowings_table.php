@@ -17,6 +17,8 @@ return new class extends Migration
             $table->date('return_date')->nullable();
             $table->string('loan_status');
             $table->date('actual_return_date')->nullable();
+            $table->boolean('is_lost')->default(false);
+            $table->boolean('is_damage')->default(false);
             $table->foreignId('id_employee')->constrained('employees');
             $table->timestamps();
         });

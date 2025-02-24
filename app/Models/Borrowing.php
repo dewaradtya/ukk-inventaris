@@ -15,12 +15,19 @@ class Borrowing extends Model
         'return_date',
         'loan_status',
         'actual_return_date',
+        'is_lost',
+        'is_damage',
         'id_employee'
     ];
 
     public function employee(): BelongsTo
     {
         return $this->belongsTo(Employee::class, 'id_employee');
+    }
+
+    public function fine()
+    {
+        return $this->hasOne(Fine::class, 'borrowing_id');
     }
 
 

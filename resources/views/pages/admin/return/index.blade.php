@@ -58,6 +58,9 @@
                                                 Pegawai
                                             </th>
                                             <th class="text-center text-secondary text-xxs font-weight-bolder opacity-7">
+                                                Denda
+                                            </th>
+                                            <th class="text-center text-secondary text-xxs font-weight-bolder opacity-7">
                                                 Inventaris Dipinjam
                                             </th>
                                             <th class="text-center text-secondary text-xxs font-weight-bolder opacity-7">
@@ -104,18 +107,31 @@
                                                 </td>
 
                                                 <td class="text-center">
+                                                    @if ($return->fine?->id)
+                                                        <a href="{{ route('fine.pay', $return->fine->id) }}"
+                                                            class="text-xs text-danger font-weight-bold mb-0"
+                                                            style="text-decoration: underline;">
+                                                            Rp {{ number_format($return->fine->fine_amount, 0, ',', '.') }}
+                                                        </a>
+                                                    @else
+                                                        <span class="text-xs text-muted font-weight-bold mb-0">Tidak Ada</span>
+                                                    @endif
+                                                </td>
+
+                                                <td class="text-center">
                                                     <ul class="text-xs mb-0">
                                                         @foreach ($return->loanDetails as $loanDetail)
                                                             <li>
                                                                 {{ $loanDetail->inventory->name ?? 'Inventaris Tidak Ditemukan' }}
                                                                 ({{ $loanDetail->amount }})
+                                                                ({{ $loanDetail->condition_returned ?? 'Tidak Diketahui' }})
                                                             </li>
                                                         @endforeach
                                                     </ul>
                                                 </td>
                                                 <td class="text-center">
                                                     <p class="text-xs mb-0">
-                                                        <a href="#" class="open-action-modal text-danger"
+                                                        <a href="#" class="open-action-modal text-info"
                                                             data-id="{{ $return->id }}" data-bs-toggle="tooltip"
                                                             data-bs-placement="top" title="Klik untuk melakukan aksi"
                                                             data-edit="{{ route('return.edit', $return->id) }}"

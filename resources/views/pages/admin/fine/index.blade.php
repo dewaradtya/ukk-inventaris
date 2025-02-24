@@ -115,17 +115,11 @@
                                                     </span>
                                                 </td>
                                                 <td class="text-center">
-                                                    <button class="btn btn-outline-success p-2 open-pay-modal"
-                                                        data-id="{{ $fine->id }}"
-                                                        data-employee="{{ $fine->borrowing->employee->name ?? 'Pegawai Tidak Ditemukan' }}"
-                                                        data-total="{{ $fine->fine_amount }}"
-                                                        data-paid="{{ $fine->paid_amount }}"
-                                                        data-remaining="{{ $fine->remaining_amount }}"
-                                                        data-bs-toggle="modal" data-bs-target="#payModal">
+                                                    <a href="{{ route('fine.pay', $fine->id) }}" class="btn btn-outline-success p-2">
                                                         <i class="fas fa-money-bill-wave text-success fa-lg"
                                                             data-bs-toggle="tooltip" data-bs-placement="top"
                                                             title="Bayar"></i>
-                                                    </button>
+                                                    </a>
 
                                                     @if ($fine->payment_proof)
                                                         <button class="btn btn-outline-info p-2 open-proof-modal"
@@ -192,7 +186,4 @@
             });
         });
     </script>
-
-
-    @include('pages.admin.fine.pay')
 @endsection

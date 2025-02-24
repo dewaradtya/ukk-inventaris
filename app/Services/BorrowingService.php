@@ -16,7 +16,7 @@ class BorrowingService
 {
     public function getBorrowings($search)
     {
-        $query = Borrowing::where('loan_status', 'borrow');
+        $query = Borrowing::whereIn('loan_status', ['pending', 'borrow', 'rejected']);
 
         if (Auth::user()->level->name === 'Peminjam') {
             $employee = Employee::where('id_user', Auth::id())->first();
@@ -57,10 +57,13 @@ class BorrowingService
 
             $returnDate = date('Y-m-d', strtotime($data['borrow_date'] . ' +7 days'));
 
+            $userLevel = Auth::user()->level->name;
+            $loanStatus = ($userLevel === 'Admin' || $userLevel === 'Operator') ? 'borrow' : 'pending';
+
             $borrowing = Borrowing::create([
                 'borrow_date' => $data['borrow_date'],
                 'return_date' => $returnDate,
-                'loan_status' => 'borrow',
+                'loan_status' => $loanStatus,
                 'id_employee' => $idEmployee,
             ]);
 
@@ -76,9 +79,12 @@ class BorrowingService
                     'id_borrowing' => $borrowing->id,
                     'id_inventories' => $inventoryId,
                     'amount' => $requestedAmount,
+                    'condition_borrowed' => $inventory->condition,
                 ]);
 
-                $inventory->decrement('amount', $requestedAmount);
+                if ($loanStatus === 'borrow') {
+                    $inventory->decrement('amount', $requestedAmount);
+                }
             }
 
             DB::commit();
@@ -105,7 +111,6 @@ class BorrowingService
             }
 
             $borrowing->loanDetails()->delete();
-
             $updateData = [
                 'borrow_date' => $data['borrow_date'],
                 'id_employee' => $idEmployee,
@@ -123,15 +128,22 @@ class BorrowingService
                 $amount = $data['amount'][$index];
                 $inventory = Inventory::find($inventoryId);
 
-                if ($inventory && $inventory->amount >= $amount) {
-                    $inventory->decrement('amount', $amount);
-                } else {
+                if (!$inventory) {
+                    throw new \Exception('Inventaris tidak ditemukan.');
+                }
+
+                if ($inventory->amount < $amount) {
                     throw new \Exception('Stok inventaris tidak mencukupi.');
                 }
+
+                $conditionBorrowed = $data['condition_borrowed'][$index] ?? $inventory->condition;
+
+                $inventory->decrement('amount', $amount);
 
                 $borrowing->loanDetails()->create([
                     'id_inventories' => $inventoryId,
                     'amount' => $amount,
+                    'condition_borrowed' => $conditionBorrowed,
                 ]);
             }
 
@@ -145,7 +157,9 @@ class BorrowingService
 
     public function deleteBorrowing($id)
     {
-        $borrowing = Borrowing::findOrFail($id);
+        $borrowing = Borrowing::where('id', $id)
+            ->whereIn('loan_status', ['pending', 'borrow', 'rejected'])
+            ->firstOrFail();
 
         foreach ($borrowing->loanDetails as $loanDetail) {
             $inventory = Inventory::find($loanDetail->id_inventories);
@@ -158,39 +172,94 @@ class BorrowingService
         $borrowing->delete();
     }
 
-    public function updateBorrowingStatus($id, $status)
+    public function updateBorrowingStatus($id, $status, $conditionReturned = [])
     {
-        $borrowing = Borrowing::findOrFail($id);
+        $borrowing = Borrowing::where('id', $id)
+            ->where('loan_status', 'borrow')
+            ->firstOrFail();
 
         if ($status === 'return' && $borrowing->loan_status !== 'return') {
-            foreach ($borrowing->loanDetails as $loanDetail) {
-                $inventory = Inventory::find($loanDetail->id_inventories);
-                if ($inventory) {
-                    $inventory->increment('amount', $loanDetail->amount);
+            DB::transaction(function () use ($borrowing, $conditionReturned) {
+                $fineAmount = 0;
+                $fineSetting = FineSetting::first();
+
+                $isLost = false;
+                $isDamaged = false;
+                $isLostFineApplied = false;
+
+                foreach ($borrowing->loanDetails as $loanDetail) {
+                    $inventory = Inventory::find($loanDetail->id_inventories);
+                    $condition = $conditionReturned[$loanDetail->id] ?? 'baik';
+
+                    if ($inventory) {
+                        if ($condition === 'baik') {
+                            $inventory->increment('amount', $loanDetail->amount);
+                        } elseif (in_array($condition, ['rusak', 'hilang'])) {
+                            $existingInventory = Inventory::where('name', $inventory->name)
+                                ->where('condition', $condition)
+                                ->where('id_type', $inventory->id_type)
+                                ->where('id_room', $inventory->id_room)
+                                ->first();
+
+                            if ($existingInventory) {
+                                $existingInventory->increment('amount', $loanDetail->amount);
+                            } else {
+                                $newCode = $inventory->code . '-' . strtoupper(substr($condition, 0, 1));
+                                $counter = 1;
+                                while (Inventory::where('code', $newCode)->exists()) {
+                                    $newCode = $inventory->code . '-' . strtoupper(substr($condition, 0, 1)) . '-' . $counter;
+                                    $counter++;
+                                }
+
+                                Inventory::create([
+                                    'name' => $inventory->name,
+                                    'condition' => $condition,
+                                    'amount' => $loanDetail->amount,
+                                    'register_date' => now(),
+                                    'code' => $newCode,
+                                    'id_type' => $inventory->id_type,
+                                    'id_room' => $inventory->id_room,
+                                    'id_user' => $inventory->id_user,
+                                ]);
+                            }
+
+                            if ($condition === 'hilang' && !$isLostFineApplied) {
+                                $isLost = true;
+                                $fineAmount += $loanDetail->amount * optional($fineSetting)->lost_fee;
+                                $isLostFineApplied = true;
+                            } elseif ($condition === 'rusak') {
+                                $isDamaged = true;
+                                $fineAmount += $loanDetail->amount * optional($fineSetting)->damage_fee;
+                            }
+                        }
+                    }
+
+                    $loanDetail->condition_returned = $condition;
+                    $loanDetail->save();
                 }
-            }
 
-            $borrowing->actual_return_date = now();
-            $borrowing->save();
+                $borrowing->actual_return_date = now();
+                $borrowing->loan_status = 'return';
+                $borrowing->is_lost = $isLost;
+                $borrowing->is_damage = $isDamaged;
+                $borrowing->save();
 
-            $fineAmount = $this->calculateFine($borrowing);
+                $fineAmount += $this->calculateFine($borrowing);
 
-            if ($fineAmount > 0) {
-                Fine::create([
-                    'borrowing_id' => $borrowing->id,
-                    'fine_amount' => $fineAmount,
-                    'status' => 'unpaid',
-                ]);
-            }
+                if ($fineAmount > 0) {
+                    Fine::create([
+                        'borrowing_id' => $borrowing->id,
+                        'fine_amount' => $fineAmount,
+                        'status' => 'unpaid',
+                    ]);
+                }
+            });
         }
 
-        $borrowing->loan_status = $status;
-        $borrowing->save();
+        return $borrowing;
     }
 
-    /**
-     * Menghitung denda.
-     */
+
     private function calculateFine($borrowing)
     {
         if (!$borrowing->actual_return_date || !$borrowing->return_date) {
@@ -207,19 +276,12 @@ class BorrowingService
         $fineAmount = 0;
 
         if ($lateDays > 0) {
-            $fineAmount = $lateDays * $fineSetting->late_fee;
-        }
-
-        if ($borrowing->is_lost) {
-            $fineAmount += $fineSetting->lost_fee;
+            $fineAmount += $lateDays * optional($fineSetting)->late_fee;
         }
 
         return $fineAmount;
     }
 
-    /**
-     * Mendapatkan ID employee berdasarkan role user.
-     */
     private function getEmployeeId($data)
     {
         if (Auth::user()->level->name === 'Peminjam') {
@@ -230,6 +292,34 @@ class BorrowingService
             return $employee->id;
         } else {
             return $data['id_employee'];
+        }
+    }
+
+    public function confirmBorrowing($id, $status)
+    {
+        DB::beginTransaction();
+
+        try {
+            $borrowing = Borrowing::findOrFail($id);
+
+            if ($status === 'approved') {
+                $borrowing->loan_status = 'borrow';
+
+                foreach ($borrowing->loanDetails as $loanDetail) {
+                    $inventory = Inventory::find($loanDetail->id_inventories);
+                    $inventory->decrement('amount', $loanDetail->amount);
+                }
+            } else {
+                $borrowing->loan_status = 'rejected';
+            }
+
+            $borrowing->save();
+
+            DB::commit();
+            return ['success' => true, 'message' => 'Status peminjaman berhasil diperbarui.'];
+        } catch (\Exception $e) {
+            DB::rollBack();
+            return ['success' => false, 'message' => $e->getMessage()];
         }
     }
 }

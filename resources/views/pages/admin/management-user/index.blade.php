@@ -25,8 +25,8 @@
                                     <a href="{{ route('level.index') }}" class="btn bg-gradient-info btn-sm">
                                         Level
                                     </a>
-                                    <button href="#" class="btn bg-gradient-primary btn-sm"
-                                        data-bs-toggle="modal" data-bs-target="#createUserManagementModal">Tambah Pengguna</button>
+                                    <button href="#" class="btn bg-gradient-primary btn-sm" data-bs-toggle="modal"
+                                        data-bs-target="#createUserManagementModal">Tambah Pengguna</button>
                                 </div>
                             </div>
                         </div>
@@ -68,9 +68,10 @@
                                             <td>
                                                 <div>
                                                     <img src="{{ $user->image ? asset('storage/' . $user->image) : asset('assets/img/default-avatar.jpg') }}"
-                                                        alt="{{ $user->name }}" class="avatar avatar-sm me-3 rounded-circle">
+                                                        alt="{{ $user->name }}"
+                                                        class="avatar avatar-sm me-3 rounded-circle">
                                                 </div>
-                                            </td>                                            
+                                            </td>
                                             <td class="text-center">
                                                 <p class="text-xs font-weight-bold mb-0">{{ $user->name }}</p>
                                             </td>
@@ -78,8 +79,10 @@
                                                 <p class="text-xs font-weight-bold mb-0">{{ $user->email }}</p>
                                             </td>
                                             <td class="text-center">
-                                                <p class="text-xs font-weight-bold mb-0">{{ $user->level->name ?? 'N/A' }}
-                                                </p>
+                                                <span
+                                                    class="badge bg-{{ $user->level->name === 'Admin' ? 'success' : ($user->level->name === 'Operator' ? 'warning' : 'danger') }}">
+                                                    {{ $user->level->name }}
+                                                </span>
                                             </td>
                                             <td class="text-center">
                                                 <span class="text-secondary text-xs font-weight-bold">

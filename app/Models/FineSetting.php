@@ -11,5 +11,5 @@ class FineSetting extends Model
 {
     use HasFactory;
 
-    protected $fillable = ['late_fee', 'lost_fee'];
+    protected $fillable = ['late_fee', 'lost_fee', 'damage_fee'];
 }

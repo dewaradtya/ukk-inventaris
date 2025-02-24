@@ -16,6 +16,8 @@ return new class extends Migration
             $table->foreignId('id_inventories')->constrained('inventories');
             $table->foreignId('id_borrowing')->constrained('borrowings');
             $table->integer('amount');
+            $table->string('condition_borrowed')->nullable();
+            $table->string('condition_returned')->nullable();
             $table->timestamps();
         });
     }

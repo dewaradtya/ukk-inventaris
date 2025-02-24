@@ -12,6 +12,7 @@ use App\Http\Controllers\InfoUserController;
 use App\Http\Controllers\InventoryController;
 use App\Http\Controllers\LevelController;
 use App\Http\Controllers\RegisterController;
+use App\Http\Controllers\ReportBorrowingController;
 use App\Http\Controllers\ResetController;
 use App\Http\Controllers\ReturnController;
 use App\Http\Controllers\RoomController;
@@ -43,10 +44,13 @@ Route::group(['middleware' => 'auth'], function () {
 		Route::resource('/user-management', UserManagementController::class);
 		Route::get('/borrowing/export', [BorrowingController::class, 'export'])->name('borrowing.export');
 		Route::get('/return/export', [ReturnController::class, 'export'])->name('return.export');
+		Route::get('/report', [ReportBorrowingController::class, 'index'])->name('report.index');
+		Route::get('/export', [ReportBorrowingController::class, 'export'])->name('report.export');
 	});
 	Route::middleware(['auth', 'userakses:Admin,Operator'])->group(function () {
-		Route::put('/borrowing/{id}/update-status', [BorrowingController::class, 'updateStatus'])
-			->name('borrowing.updateStatus');
+		Route::get('/borrowing/{id}/return', [BorrowingController::class, 'return'])->name('borrowing.return');
+		Route::put('/borrowing/{id}/update-status', [BorrowingController::class, 'updateStatus'])->name('borrowing.updateStatus');
+		Route::post('/borrowing/{id}/confirm', [BorrowingController::class, 'confirmBorrowing'])->name('borrowing.confirm');
 		Route::resource('/return', ReturnController::class);
 		Route::get('fine-settings', [FineSettingController::class, 'index'])->name('fine.settings');
 		Route::put('fine/settings', [FineSettingController::class, 'update'])->name('fine.settings.update');
@@ -61,7 +65,8 @@ Route::group(['middleware' => 'auth'], function () {
 	Route::post('/user-profile', [InfoUserController::class, 'store']);
 	Route::post('/user-profile/update-image', [InfoUserController::class, 'updateImage'])->name('profile.update.image');
 	Route::resource('/fine', FineController::class);
-	Route::post('/fine/{id}/pay', [FineController::class, 'payFine'])->name('fine.pay');
+	Route::get('/fine/{fine}/pay', [FineController::class, 'payPage'])->name('fine.pay');
+	Route::post('/fine/{fine}/pay', [FineController::class, 'processPayment'])->name('fine.pay.process');
 	Route::get('/login', function () {
 		return view('dashboard');
 	})->name('sign-up');

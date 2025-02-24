@@ -87,8 +87,17 @@
 
                                                 <td class="text-center">
                                                     <span
-                                                        class="badge {{ $borrowing->loan_status === 'borrow' ? 'bg-warning' : 'bg-success' }}">
-                                                        {{ $borrowing->loan_status === 'borrow' ? 'Dipinjam' : 'Dikembalikan' }}
+                                                        class="badge 
+                                                        {{ $borrowing->loan_status === 'pending'
+                                                            ? 'bg-secondary'
+                                                            : ($borrowing->loan_status === 'borrow'
+                                                                ? 'bg-warning'
+                                                                : 'bg-danger') }}">
+                                                        {{ $borrowing->loan_status === 'pending'
+                                                            ? 'Menunggu Konfirmasi'
+                                                            : ($borrowing->loan_status === 'borrow'
+                                                                ? 'Dipinjam'
+                                                                : 'Ditolak') }}
                                                     </span>
                                                 </td>
 
@@ -110,19 +119,42 @@
                                                     </ul>
                                                 </td>
 
+
+
                                                 <td class="text-center">
-                                                    <p class="text-xs mb-0">
-                                                        <a href="#" class="open-action-modal text-danger"
-                                                            data-id="{{ $borrowing->id }}" data-bs-toggle="tooltip"
-                                                            data-bs-placement="top" title="Klik untuk melakukan aksi"
-                                                            data-edit="{{ route('borrowing.edit', $borrowing->id) }}"
-                                                            data-proof="{{ route('borrowing.proof', $borrowing->id) }}"
-                                                            data-delete="{{ route('borrowing.destroy', $borrowing->id) }}"
-                                                            data-status="{{ route('borrowing.updateStatus', $borrowing->id) }}"
-                                                            data-loan-status="{{ $borrowing->loan_status }}">
-                                                            <i class="fas fa-ellipsis fa-2x"></i>
-                                                        </a>
-                                                    </p>
+                                                    @if (Auth::check() && (Auth::user()->level->name === 'Admin' || Auth::user()->level->name === 'Operator'))
+                                                        @if ($borrowing->loan_status === 'pending')
+                                                            <form action="{{ route('borrowing.confirm', $borrowing->id) }}"
+                                                                method="POST" class="d-inline">
+                                                                @csrf
+                                                                <button type="submit" name="status" value="approved"
+                                                                    class="btn btn-success p-2" data-bs-toggle="tooltip"
+                                                                    data-bs-placement="top" title="Setujui">
+                                                                    <i class="fas fa-check"></i>
+                                                                </button>
+                                                                <button type="submit" name="status" value="rejected"
+                                                                    class="btn btn-danger p-2" data-bs-toggle="tooltip"
+                                                                    data-bs-placement="top" title="Tolak">
+                                                                    <i class="fas fa-times"></i>
+                                                                </button>
+                                                            </form>
+                                                        @endif
+                                                    @endif
+                                                    @if ($borrowing->loan_status === 'borrow')
+                                                        <p class="text-xs mb-0">
+                                                            <a href="#" class="open-action-modal text-info"
+                                                                data-id="{{ $borrowing->id }}" data-bs-toggle="tooltip"
+                                                                data-bs-placement="top" title="Klik untuk melakukan aksi"
+                                                                data-edit="{{ route('borrowing.edit', $borrowing->id) }}"
+                                                                data-proof="{{ route('borrowing.proof', $borrowing->id) }}"
+                                                                data-delete="{{ route('borrowing.destroy', $borrowing->id) }}"
+                                                                data-status="{{ route('borrowing.return', $borrowing->id) }}"
+                                                                data-loan-status="{{ $borrowing->loan_status }}">
+                                                                <i class="fas fa-ellipsis fa-2x"></i>
+                                                            </a>
+                                                        </p>
+                                                    @endif
+
                                                 </td>
                                             </tr>
                                         @empty

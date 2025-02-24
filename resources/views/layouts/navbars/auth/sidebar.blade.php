@@ -34,6 +34,19 @@
                     <span class="nav-link-text ms-1">Laporan Denda</span>
                 </a>
             </li>
+            @if (Auth::check() && Auth::user()->level->name === 'Admin')
+                <li class="nav-item">
+                    <a class="nav-link {{ Request::is('report') ? 'active' : '' }}" href="{{ url('report') }}">
+                        <div
+                            class="icon icon-shape icon-sm shadow border-radius-md bg-white text-center me-2 d-flex align-items-center justify-content-center">
+                            <i class="fas fa-file ps-2 pe-2 text-center text-dark {{ Request::is('report') ? 'text-white' : 'text-dark' }} "
+                                aria-hidden="true"></i>
+                        </div>
+                        <span class="nav-link-text ms-1">Laporan Peminjaman</span>
+                    </a>
+                </li>
+            @endif
+
             <li class="nav-item mt-2">
                 <h6 class="ps-4 ms-2 text-uppercase text-xs font-weight-bolder opacity-6">Master</h6>
             </li>
@@ -90,8 +103,9 @@
             </li>
 
             @if (Auth::check() && in_array(Auth::user()->level->name, ['Admin', 'Operator']))
-            <li class="nav-item">
-                    <a class="nav-link {{ Request::is('fine-settings') ? 'active' : '' }}" href="{{ url('fine-settings') }}">
+                <li class="nav-item">
+                    <a class="nav-link {{ Request::is('fine-settings') ? 'active' : '' }}"
+                        href="{{ url('fine-settings') }}">
                         <div
                             class="icon icon-shape icon-sm shadow border-radius-md bg-white text-center me-2 d-flex align-items-center justify-content-center">
                             <i class="fas fa-gears ps-2 pe-2 text-center text-dark {{ Request::is('fine-settings') ? 'text-white' : 'text-dark' }} "

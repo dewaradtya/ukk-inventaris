@@ -25,6 +25,17 @@
                                 </div>
 
                                 <div class="mb-3">
+                                    <label class="form-label">Denda Kerusakan Barang (Rp)</label>
+                                    <input type="number" name="damage_fee" class="form-control"
+                                        value="{{ $fineSetting->damage_fee }}" required>
+                                    @error('damage_fee')
+                                        <div class="invalid-feedback">
+                                            {{ $message }}
+                                        </div>
+                                    @enderror
+                                </div>
+
+                                <div class="mb-3">
                                     <label class="form-label">Denda Kehilangan Barang (Rp)</label>
                                     <input type="number" name="lost_fee" class="form-control"
                                         value="{{ $fineSetting->lost_fee }}" required>

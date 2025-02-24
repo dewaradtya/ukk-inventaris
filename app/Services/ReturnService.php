@@ -16,20 +16,15 @@ class ReturnService
 
             return $employee
                 ? Borrowing::where('id_employee', $employee->id)
-                    ->where('loan_status', 'return')
-                    ->with('employee')
-                    ->paginate(10)
+                ->where('loan_status', 'return')
+                ->with(['employee', 'fine'])
+                ->paginate(10)
                 : Borrowing::where('id', null)->paginate(10);
         }
 
         return Borrowing::where('loan_status', 'return')
-            ->with('employee')
+            ->with(['employee', 'fine'])
             ->paginate(10);
-    }
-
-    public function updateLoanStatus(Borrowing $borrowing, string $loanStatus): void
-    {
-        $borrowing->update(['loan_status' => $loanStatus]);
     }
 
     public function generateProof(Borrowing $borrowing)

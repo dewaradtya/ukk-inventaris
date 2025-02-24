@@ -9,41 +9,34 @@
                 <div class="d-flex justify-content-center gap-4">
                     <a href="#" id="editLink"
                         class="btn btn-primary d-flex align-items-center rounded-circle p-4 gap-4"
-                        data-bs-toggle="tooltip" data-bs-placement="top"
-                        data-bs-custom-class="custom-tooltip" data-bs-title="Edit Peminjaman">
+                        data-bs-toggle="tooltip" data-bs-placement="top" data-bs-custom-class="custom-tooltip"
+                        data-bs-title="Edit Peminjaman">
                         <i class="fas fa-pen fa-2x"></i>
                     </a>
                     <a href="#" id="proofLink"
                         class="btn btn-secondary d-flex align-items-center rounded-circle p-4 gap-4" target="_blank"
-                        data-bs-toggle="tooltip" data-bs-placement="top"
-                        data-bs-custom-class="custom-tooltip" data-bs-title="Bukti Peminjaman">
+                        data-bs-toggle="tooltip" data-bs-placement="top" data-bs-custom-class="custom-tooltip"
+                        data-bs-title="Bukti Peminjaman">
                         <i class="fas fa-file-alt fa-2x"></i>
                     </a>
                     <form id="deleteForm" method="POST" class="d-inline">
                         @csrf
                         @method('DELETE')
-                        <button type="submit"
-                            class="btn btn-danger d-flex align-items-center rounded-circle p-4 gap-4"
+                        <button type="submit" class="btn btn-danger d-flex align-items-center rounded-circle p-4 gap-4"
                             onclick="return confirm('Apakah Anda yakin ingin menghapus peminjaman ini?')"
-                            data-bs-toggle="tooltip" data-bs-placement="top"
-                            data-bs-custom-class="custom-tooltip" data-bs-title="Hapus Peminjaman">
+                            data-bs-toggle="tooltip" data-bs-placement="top" data-bs-custom-class="custom-tooltip"
+                            data-bs-title="Hapus Peminjaman">
                             <i class="fas fa-trash fa-2x"></i>
                         </button>
                     </form>
 
                     @if (Auth::check() && in_array(Auth::user()->level->name, ['Admin', 'Operator']))
-                    <form id="returnForm" method="POST" class="d-inline" style="display: none;">
-                            @csrf
-                            @method('PUT')
-                            <input type="hidden" name="loan_status" value="return">
-                            <button type="submit"
-                                class="btn btn-success d-flex align-items-center rounded-circle p-4 gap-4"
-                                onclick="return confirm('Apakah Anda yakin ingin mengubah status peminjaman ini?')"
-                                data-bs-toggle="tooltip" data-bs-placement="top"
-                                data-bs-custom-class="custom-tooltip" data-bs-title="Sudah Dikembalikan">
-                                <i class="fas fa-check fa-2x"></i>
-                            </button>
-                        </form>
+                        <a href="#" id="returnLink"
+                            class="btn btn-success d-flex align-items-center rounded-circle p-4 gap-4"
+                            data-bs-toggle="tooltip" data-bs-placement="top" data-bs-custom-class="custom-tooltip"
+                            data-bs-title="Form Pengembalian">
+                            <i class="fas fa-check fa-2x"></i>
+                        </a>
                     @endif
                 </div>
             </div>
@@ -57,7 +50,7 @@
         const editLink = document.getElementById("editLink");
         const proofLink = document.getElementById("proofLink");
         const deleteForm = document.getElementById("deleteForm");
-        const returnForm = document.getElementById("returnForm");
+        const returnLink = document.getElementById("returnLink");
 
         document.body.addEventListener("click", function(event) {
             const target = event.target.closest(".open-action-modal");
@@ -77,9 +70,9 @@
             proofLink.href = proofUrl;
             deleteForm.action = deleteUrl;
 
-            if (returnForm) {
-                returnForm.action = statusUrl;
-                returnForm.style.display = loanStatus === "borrow" ? "inline-block" : "none";
+            if (returnLink) {
+                returnLink.href = statusUrl;
+                returnLink.style.display = loanStatus === "borrow" ? "inline-block" : "none";
             }
 
             actionModal.show();

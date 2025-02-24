@@ -11,6 +11,7 @@ use App\Models\Inventory;
 use App\Services\BorrowingService;
 use Barryvdh\DomPDF\Facade\Pdf;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\DB;
 use Maatwebsite\Excel\Facades\Excel;
 
 class BorrowingController extends Controller
@@ -30,7 +31,7 @@ class BorrowingController extends Controller
         return view('pages.admin.borrowing.index', [
             'borrowings'  => $borrowings,
             'employees'   => Employee::all(),
-            'inventories' => Inventory::all(),
+            'inventories' => Inventory::where('condition', 'baik')->get(),
         ]);
     }
 
@@ -45,7 +46,7 @@ class BorrowingController extends Controller
     {
         try {
             $this->borrowingService->storeBorrowing($request->validated());
-            return redirect()->route('borrowing.index')->with('success', 'Borrowing dan Loan Detail berhasil ditambahkan');
+            return redirect()->route('borrowing.index')->with('success', 'Peminjaman dan detail peminjaman berhasil ditambahkan');
         } catch (\Exception $e) {
             return redirect()->back()->with('error', $e->getMessage());
         }
@@ -53,12 +54,36 @@ class BorrowingController extends Controller
 
     public function edit(string $id)
     {
-        $borrowing = Borrowing::findOrFail($id);
-        return view('pages.admin.borrowing.edit', [
-            'borrowing' => $borrowing,
-            'employees' => Employee::all(),
-            'inventories' => Inventory::all(),
-        ]);
+        $borrowing = Borrowing::where('id', $id)
+            ->whereIn('loan_status', ['pending', 'borrow', 'rejected'])
+            ->first();
+
+        if (!$borrowing) {
+            return redirect()->back()->with('error', 'Data peminjaman tidak ditemukan atau tidak dapat diedit.');
+        }
+
+        return view('pages.admin.borrowing.edit', compact('borrowing'))
+            ->with([
+                'employees' => Employee::all(),
+                'inventories' => Inventory::where('condition', 'baik')->get(),
+            ]);
+    }
+
+    public function return(string $id)
+    {
+        $borrowing = Borrowing::where('id', $id)
+            ->where('loan_status', 'borrow')
+            ->first();
+
+        if (!$borrowing) {
+            return redirect()->back()->with('error', 'Data peminjaman tidak ditemukan atau tidak dapat diedit.');
+        }
+
+        return view('pages.admin.borrowing.return', compact('borrowing'))
+            ->with([
+                'employees' => Employee::all(),
+                'inventories' => Inventory::all(),
+            ]);
     }
 
     public function update(BorrowingUpdateRequest $request, string $id)
@@ -83,8 +108,17 @@ class BorrowingController extends Controller
 
     public function updateStatus(Request $request, $id)
     {
+        $request->validate([
+            'condition_returned' => 'array',
+            'condition_returned.*' => 'nullable|string|max:255',
+        ]);
+
         try {
-            $this->borrowingService->updateBorrowingStatus($id, $request->loan_status);
+            $this->borrowingService->updateBorrowingStatus(
+                $id,
+                $request->loan_status,
+                $request->condition_returned
+            );
             return redirect()->route('borrowing.index')->with('success', 'Status peminjaman berhasil diperbarui.');
         } catch (\Exception $e) {
             return redirect()->back()->with('error', $e->getMessage());
@@ -110,8 +144,24 @@ class BorrowingController extends Controller
 
     public function proof(string $id)
     {
-        $borrowing = Borrowing::with('employee', 'loanDetails.inventory')->findOrFail($id);
+        $borrowing = Borrowing::with('employee', 'loanDetails.inventory')
+            ->where('id', $id)
+            ->where('loan_status', 'borrow')
+            ->firstOrFail();
+
         $pdf = Pdf::loadView('pages.admin.borrowing.proof', compact('borrowing'));
         return $pdf->stream('bukti_peminjaman.pdf');
+    }
+
+    public function confirmBorrowing($id, Request $request)
+    {
+        $status = $request->input('status');
+        $result = $this->borrowingService->confirmBorrowing($id, $status);
+
+        if ($result['success']) {
+            return redirect()->back()->with('success', $result['message']);
+        } else {
+            return redirect()->back()->with('error', $result['message']);
+        }
     }
 }

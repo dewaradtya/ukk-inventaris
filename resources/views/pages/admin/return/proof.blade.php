@@ -32,13 +32,15 @@
             margin-bottom: 25px;
         }
 
-        .table th, .table td {
+        .table th,
+        .table td {
             border: 1px solid #dee2e6;
             padding: 12px 15px;
             vertical-align: middle;
         }
 
-        .table th, .bg-light {
+        .table th,
+        .bg-light {
             background-color: #e9ecef;
         }
 
@@ -56,15 +58,19 @@
     <table class="table">
         <tr>
             <td class="bg-light" style="width: 35%"><strong>Nama Peminjam</strong></td>
-            <td>{{ $borrowing->employee->name ?? 'Tidak Diketahui' }}</td>
+            <td>{{ optional($borrowing->employee)->name ?? 'Tidak Diketahui' }}</td>
         </tr>
         <tr>
             <td class="bg-light"><strong>Tanggal Peminjaman</strong></td>
-            <td>{{ \Carbon\Carbon::parse($borrowing->borrow_date)->translatedFormat('d M Y') }}</td>
+            <td>{{ optional($borrowing->borrow_date) ? \Carbon\Carbon::parse($borrowing->borrow_date)->translatedFormat('d M Y') : '-' }}</td>
         </tr>
         <tr>
             <td class="bg-light"><strong>Tanggal Pengembalian</strong></td>
-            <td>{{ \Carbon\Carbon::parse($borrowing->return_date)->translatedFormat('d M Y') }}</td>
+            <td>{{ optional($borrowing->return_date) ? \Carbon\Carbon::parse($borrowing->return_date)->translatedFormat('d M Y') : '-' }}</td>
+        </tr>
+        <tr>
+            <td class="bg-light"><strong>Tanggal Dikembalikan</strong></td>
+            <td>{{ optional($borrowing->actual_return_date) ? \Carbon\Carbon::parse($borrowing->actual_return_date)->translatedFormat('d M Y') : '-' }}</td>
         </tr>
         <tr>
             <td class="bg-light"><strong>Status</strong></td>
@@ -79,21 +85,33 @@
             <tr>
                 <th style="width: 5%">No</th>
                 <th>Nama Inventaris</th>
-                <th style="width: 20%" class="text-center">Jumlah</th>
+                <th>Kondisi Barang Dipinjam</th>
+                <th>Kondisi Barang Dikembalikan</th>
+                <th style="width: 15%" class="text-center">Jumlah</th>
+                <th style="width: 20%" class="text-center">Denda</th>
             </tr>
         </thead>
         <tbody>
             @foreach ($borrowing->loanDetails as $index => $loanDetail)
                 <tr>
                     <td class="text-center">{{ $index + 1 }}</td>
-                    <td>{{ $loanDetail->inventory->name ?? 'Inventaris Tidak Ditemukan' }}</td>
-                    <td class="text-center">{{ $loanDetail->amount }}</td>
+                    <td>{{ optional($loanDetail->inventory)->name ?? 'Tidak Diketahui' }}</td>
+                    <td>{{ $loanDetail->condition_borrowed ?? '-' }}</td>
+                    <td>{{ $loanDetail->condition_returned ?? '-' }}</td>
+                    <td class="text-center">{{ $loanDetail->amount ?? 0 }}</td>
+                    <td class="text-center">
+                        Rp {{ number_format(optional($loanDetail->fine)->fine_amount ?? 0, 0, ',', '.') }}
+                    </td>
                 </tr>
             @endforeach
         </tbody>
+        <tfoot>
+            <tr>
+                <th colspan="5" class="text-end bg-light">Total Denda</th>
+                <th class="text-center bg-light">Rp {{ number_format(optional($borrowing->fine)->fine_amount ?? 0, 0, ',', '.') }}</th>
+            </tr>
+        </tfoot>
     </table>
-
-    <p><strong>Note:</strong> Semua barang telah diterima kembali dalam kondisi baik oleh Admin Inventaris.</p>
 
     <div style="margin-top: 80px;">
         <table style="text-align: center; width: 100%;">
@@ -101,13 +119,13 @@
                 <td style="text-align: center; width: 50%;">
                     <div>Admin Inventaris,</div>
                     <div style="margin-top: 80px; font-weight: bold; text-decoration: underline;">
-                        {{ optional($borrowing->loanDetails->first()?->inventory?->user)->name ?? 'Tidak Diketahui' }}
+                        {{ optional(optional($borrowing->loanDetails->first())->inventory->user)->name ?? 'Tidak Diketahui' }}
                     </div>
                 </td>
                 <td style="text-align: center; width: 50%;">
                     <div>Peminjam,</div>
                     <div style="margin-top: 80px; font-weight: bold; text-decoration: underline;">
-                        {{ $borrowing->employee->name ?? 'Tidak Diketahui' }}
+                        {{ optional($borrowing->employee)->name ?? 'Tidak Diketahui' }}
                     </div>
                 </td>
             </tr>

@@ -9,8 +9,9 @@ return new class extends Migration {
     {
         Schema::create('fine_settings', function (Blueprint $table) {
             $table->id();
-            $table->unsignedBigInteger('late_fee')->default(500);
-            $table->unsignedBigInteger('lost_fee')->default(50000);
+            $table->unsignedBigInteger('late_fee');
+            $table->unsignedBigInteger('damage_fee');
+            $table->unsignedBigInteger('lost_fee');
             $table->timestamps();
         });
     }

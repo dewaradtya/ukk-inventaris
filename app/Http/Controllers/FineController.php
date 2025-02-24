@@ -29,7 +29,12 @@ class FineController extends Controller
         ]);
     }
 
-    public function payFine(FinePaymentRequest $request, $id)
+    public function payPage(Fine $fine)
+    {
+        return view('pages.admin.fine.pay', compact('fine'));
+    }
+
+    public function processPayment(FinePaymentRequest $request, $id)
     {
         $fine = Fine::findOrFail($id);
 

@@ -7,12 +7,6 @@
             </div>
             <div class="modal-body">
                 <div class="d-flex justify-content-center gap-4">
-                    @if (Auth::check() && in_array(Auth::user()->level->name, ['Admin', 'Operator']))
-                        <a href="#" id="editLink" class="btn btn-primary d-flex align-items-center rounded-circle p-4 gap-4"
-                            data-bs-toggle="tooltip" data-bs-title="Edit Peminjaman">
-                            <i class="fas fa-pen fa-2x"></i>
-                        </a>
-                    @endif
                     <a href="#" id="proofLink" class="btn btn-secondary d-flex align-items-center rounded-circle p-4 gap-4" target="_blank"
                         data-bs-toggle="tooltip" data-bs-title="Bukti Peminjaman">
                         <i class="fas fa-file-alt fa-2x"></i>

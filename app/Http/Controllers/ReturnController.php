@@ -30,27 +30,21 @@ class ReturnController extends Controller
         ]);
     }
 
-    public function edit(string $id)
-    {
-        return view('pages.admin.return.edit', [
-            'return' => Borrowing::findOrFail($id),
-            'employees' => Employee::all(),
-            'inventories' => Inventory::all(),
-        ]);
-    }
-
-    public function update(ReturnUpdateRequest $request, $id)
-    {
-        $borrowing = Borrowing::findOrFail($id);
-        $this->returnService->updateLoanStatus($borrowing, $request->loan_status);
-
-        return redirect()->route('return.index')->with('success', 'Status pengembalian berhasil diperbarui.');
-    }
-
     public function proof(string $id)
     {
-        return $this->returnService->generateProof(Borrowing::with('employee', 'loanDetails.inventory')->findOrFail($id));
+        $borrowing = Borrowing::with([
+            'employee',
+            'loanDetails.inventory',
+            'loanDetails.fine',
+            'fine'
+        ])
+            ->where('id', $id)
+            ->where('loan_status', 'return')
+            ->firstOrFail();
+
+        return $this->returnService->generateProof($borrowing);
     }
+
 
     public function export(Request $request)
     {

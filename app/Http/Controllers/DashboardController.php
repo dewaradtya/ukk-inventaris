@@ -13,7 +13,7 @@ class DashboardController extends Controller
     {
         $user = auth()->user();
 
-        $inventorys = Inventory::all();
+        $inventorys = Inventory::where('condition', 'baik')->get();
         $employee = Employee::where('id_user', $user->id)->first();
         $idEmployee = optional($employee)->id ?? 0;
 

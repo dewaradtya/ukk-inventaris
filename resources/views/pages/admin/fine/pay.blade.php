@@ -1,102 +1,80 @@
-<div class="modal fade" id="payModal" tabindex="-1" aria-labelledby="payModalLabel" aria-hidden="true">
-    <div class="modal-dialog modal-lg modal-dialog-centered">
-        <div class="modal-content">
-            <div class="modal-header bg-primary">
-                <h5 class="modal-title text-white" id="payModalLabel">Bayar Denda</h5>
-                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
-            </div>
-            <div class="modal-body">
-                <form id="payForm" method="POST" enctype="multipart/form-data">
-                    @csrf
-                    @method('POST')
-                    <input type="hidden" id="fineId" name="fine_id">
-                    <div class="row">
-                        <div class="mb-3">
-                            <label class="form-label">Nama Pegawai</label>
-                            <input type="text" id="employeeName" class="form-control" readonly>
-                        </div>
+@extends('layouts.user_type.auth')
 
-                        <div class="col-md-6">
-                            <div class="mb-3">
-                                <label class="form-label">Total Denda</label>
-                                <input type="text" id="totalFine" class="form-control" readonly>
-                            </div>
+@section('content')
+    <main class="main-content position-relative max-height-vh-100 h-100 mt-1 border-radius-lg">
+        <div class="container-fluid py-4">
+            <div class="row">
+                <div class="col-12">
+                    <div class="card">
+                        <div class="card-header pb-0">
+                            <h5 class="mb-0">Bayar Denda</h5>
                         </div>
+                        <div class="card-body">
+                            <form action="{{ route('fine.pay.process', $fine->id) }}" method="POST"
+                                enctype="multipart/form-data">
+                                @csrf
+                                <div class="row">
+                                    <div class="mb-3">
+                                        <label class="form-label">Nama Pegawai</label>
+                                        <input type="text" class="form-control"
+                                            value="{{ $fine->borrowing->employee->name ?? 'Pegawai Tidak Ditemukan' }}"
+                                            readonly>
+                                    </div>
 
-                        <div class="col-md-6">
-                            <div class="mb-3">
-                                <label class="form-label">Sudah Dibayar</label>
-                                <input type="text" id="paidAmount" class="form-control" readonly>
-                            </div>
-                        </div>
+                                    <div class="col-md-6">
+                                        <div class="mb-3">
+                                            <label class="form-label">Total Denda</label>
+                                            <input type="text" class="form-control"
+                                                value="Rp {{ number_format($fine->fine_amount, 0, ',', '.') }}" readonly>
+                                        </div>
+                                    </div>
 
-                        <div class="mb-3">
-                            <label class="form-label">Sisa Pembayaran</label>
-                            <input type="text" id="remainingAmount" class="form-control" readonly>
-                        </div>
+                                    <div class="col-md-6">
+                                        <div class="mb-3">
+                                            <label class="form-label">Sudah Dibayar</label>
+                                            <input type="text" class="form-control"
+                                                value="Rp {{ number_format($fine->paid_amount, 0, ',', '.') }}" readonly>
+                                        </div>
+                                    </div>
 
-                        <div class="mb-3">
-                            <label class="form-label">Nominal Pembayaran</label>
-                            <input type="number" id="paymentAmount" name="payment_amount" class="form-control"
-                                required>
-                        </div>
-                        <div class="mb-3">
-                            <label for="payment_proof" class="form-label">Bukti Pembayaran</label>
-                            <input type="file" class="form-control @error('payment_proof') is-invalid @enderror"
-                                id="payment_proof" name="payment_proof">
-                            <div class="mt-2">
-                                <img id="previewImage" src="" alt="Bukti bayar"
-                                    style="width: 100px; display: none;">
-                            </div>
-                            @error('payment_proof')
-                                <div class="invalid-feedback">
-                                    {{ $message }}
+                                    <div class="mb-3">
+                                        <label class="form-label">Sisa Pembayaran</label>
+                                        <input type="text" class="form-control"
+                                            value="Rp {{ number_format($fine->remaining_amount, 0, ',', '.') }}" readonly>
+                                    </div>
+
+                                    <div class="mb-3">
+                                        <label class="form-label">Nominal Pembayaran</label>
+                                        <input type="number" name="payment_amount"
+                                            class="form-control @error('payment_amount') is-invalid @enderror">
+                                        @error('payment_amount')
+                                            <div class="invalid-feedback">
+                                                {{ $message }}
+                                            </div>
+                                        @enderror
+                                    </div>
+
+                                    <div class="mb-3">
+                                        <label class="form-label">Bukti Pembayaran</label>
+                                        <input type="file" name="payment_proof"
+                                            class="form-control @error('payment_proof') is-invalid @enderror">
+                                        @error('payment_proof')
+                                            <div class="invalid-feedback">
+                                                {{ $message }}
+                                            </div>
+                                        @enderror
+                                    </div>
                                 </div>
-                            @enderror
+
+                                <div class="card-footer">
+                                    <button type="submit" class="btn btn-primary">Bayar</button>
+                                    <a href="{{ route('fine.index') }}" class="btn btn-secondary">Kembali</a>
+                                </div>
+                            </form>
                         </div>
                     </div>
-                    <div class="modal-footer">
-                        <button type="submit" class="btn btn-primary">Bayar</button>
-                    </div>
-                </form>
+                </div>
             </div>
         </div>
-    </div>
-</div>
-
-<script>
-    document.addEventListener("DOMContentLoaded", function() {
-        const payForm = document.getElementById("payForm");
-
-        document.querySelectorAll(".open-pay-modal").forEach(button => {
-            button.addEventListener("click", function() {
-                const fineId = this.getAttribute("data-id");
-                const employeeName = this.getAttribute("data-employee");
-                const totalFine = this.getAttribute("data-total");
-                const paidAmount = this.getAttribute("data-paid");
-                const remainingAmount = this.getAttribute("data-remaining");
-
-                document.getElementById("fineId").value = fineId;
-                document.getElementById("employeeName").value = employeeName;
-                document.getElementById("totalFine").value = totalFine;
-                document.getElementById("paidAmount").value = paidAmount;
-                document.getElementById("remainingAmount").value = remainingAmount;
-
-                payForm.setAttribute("action", `/fine/${fineId}/pay`);
-            });
-        });
-    });
-
-    document.getElementById('payment_proof').addEventListener('change', function(event) {
-        const file = event.target.files[0];
-        if (file) {
-            const reader = new FileReader();
-            reader.onload = function(e) {
-                const previewImage = document.getElementById('previewImage');
-                previewImage.src = e.target.result;
-                previewImage.style.display = "block";
-            };
-            reader.readAsDataURL(file);
-        }
-    });
-</script>
+    </main>
+@endsection

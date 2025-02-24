@@ -18,10 +18,11 @@ class FineSettingController extends Controller
         $request->validate([
             'late_fee' => 'required|numeric|min:1',
             'lost_fee' => 'required|numeric|min:1',
+            'damage_fee' => 'required|numeric|min:1',
         ]);
 
         $fineSetting = FineSetting::first();
-        $fineSetting->update($request->only(['late_fee', 'lost_fee']));
+        $fineSetting->update($request->only(['late_fee', 'lost_fee', 'damage_fee']));
 
         return redirect()->route('fine.settings')->with('success', 'Pengaturan denda berhasil diperbarui.');
     }

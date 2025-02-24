@@ -14,6 +14,8 @@ class LoanDetail extends Model
         'id_inventories',
         'id_borrowing',
         'amount',
+        'condition_borrowed',
+        'condition_returned',
     ];
 
     public function inventory(): BelongsTo
@@ -24,5 +26,10 @@ class LoanDetail extends Model
     public function borrowing(): BelongsTo
     {
         return $this->belongsTo(Borrowing::class, 'id_borrowing');
+    }
+
+    public function fine(): BelongsTo
+    {
+        return $this->belongsTo(Fine::class, 'id_borrowing', 'borrowing_id');
     }
 }

@@ -21,6 +21,7 @@ class DatabaseSeeder extends Seeder
             RoomSeeder::class,
             InventorySeeder::class,
             EmployeeSeeder::class,
+            FineSettingSeeder::class,
         ]);
     }
 }
